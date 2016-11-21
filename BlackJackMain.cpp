@@ -35,26 +35,18 @@
 using namespace std;
 using namespace myValidation;
 using namespace GUI;
-/* Delay() function
- * - Delays the program for a specified amount of time in seconds
- *  @param seconds: the number of seconds to delay the program
- *	@returns void
-*/
-//double GetValidDouble(const double MIN, const double MAX);
 
-//void Delay(double seconds);
-//void GameScreen(Player& player1, Player& dealer);
-//void DisplayBanner();               // Function to display game banner
-//void GameInfo(Player& player1);
-//void RoundScreen(Player& player1, Player& dealer);
+/*************************
+ FUNCTION DECLARATIONS
+**************************/
 bool BeginGamePrompt();
 
 const double MINIMUM_BET = 5;
 int main()
 {
 	bool wishToPlay = true;
-    srand(time(0));                 // Needed for random_shuffle to work should only be implemented once, so in blackjack.cpp main
-    SetConsoleOutputCP(65001);           // Code Page must be set to this for Unicode characters to work properly
+    srand(time(0));                        // Needed for random_shuffle to work should only be implemented once, so in blackjack.cpp main
+    SetConsoleOutputCP(65001);             // Code Page must be set to this for Unicode characters to work properly
     DisplayBanner();
     try
     {
@@ -106,19 +98,24 @@ int main()
                 GameScreen(player1, dealer);
             }                        
             
-            // TODO : need to check for blackjack
-            
-            
-            
+            // TODO : need to check for blackjack    
+            if(player1.GetTotalValue() == 21 && dealer.GetTotalValue() == 21)
+            {
+                cout << "Both you and the dealer have BLACKJACK!" << endl
+                     << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+                //player1.CollectMoney(playerBet);
+            } 
+            else if(player1.GetTotalValue() == 21 && dealer.GetTotalValue() < 21)
+            {
+                cout << "BlackJack!! You win $" << ((playerBet * 2) * 1.5) << endl;
+                //player1.CollectMoney(playerBet);
+            }
+            else
+            {
+                // continue the round
+            }
             wishToPlay = false;
-            // TODO:: make dealer an extension of player class
-            // TODO:: Create game
-               //GameBlackJack newGame();
-            // TODO:: Start game
-            // TODO::
-            // TODO::
-            // TODO::
-            // TODO::           
+            // TODO:: make dealer an extension of player class            
            
         }
             
@@ -137,7 +134,9 @@ int main()
 }
 
 
-
+/*************************
+ FUNCTION DEFINITIONS
+**************************/
 bool BeginGamePrompt()
 {    
 	bool play = true;
@@ -170,97 +169,7 @@ bool BeginGamePrompt()
     
     return play;
 }
-//
-//void GameScreen(Player& player1, Player& dealer)
-//{
-//    system("CLS");
-//    DisplayBanner();
-//    GameInfo(player1);
-//    RoundScreen(player1, dealer);
-//}
-//
-//void DisplayBanner()
-//{
-////    cout << "====================================================================================================" << endl
-////         << "=       _/_/_/    _/          _/_/      _/_/_/  _/    _/        _/    _/_/      _/_/_/  _/    _/   =" << endl
-////         << "=      _/    _/  _/        _/    _/  _/        _/  _/          _/  _/    _/  _/        _/  _/      =" << endl
-////         << "=     _/_/_/    _/        _/_/_/_/  _/        _/_/            _/  _/_/_/_/  _/        _/_/         =" << endl
-////         << "=    _/    _/  _/        _/    _/  _/        _/  _/    _/    _/  _/    _/  _/        _/  _/        =" << endl
-////         << "=   _/_/_/    _/_/_/_/  _/    _/    _/_/_/  _/    _/    _/_/    _/    _/    _/_/_/  _/    _/       =" << endl
-////         << "====================================================================================================" << endl;
-////    cout << "===================================================================================================================" << endl     
-////         << "=         ______     __         ______     ______     __  __       __     ______     ______     __  __            =" << endl
-////         << "=        /\  == \   /\ \       /\  __ \   /\  ___\   /\ \/ /      /\ \   /\  __ \   /\  ___\   /\ \/ /            =" << endl
-////         << '=        \ \  __<   \ \ \____  \ \  __ \  \ \ \____  \ \  _"-.   _\_\ \  \ \  __ \  \ \ \____  \ \  _"-.          =' << endl
-////         << "=         \ \_____\  \ \_____\  \ \_\ \_\  \ \_____\  \ \_\ \_\ /\_____\  \ \_\ \_\  \ \_____\  \ \_\ \_\         =" << endl
-////         << "=          \/_____/   \/_____/   \/_/\/_/   \/_____/   \/_/\/_/ \/_____/   \/_/\/_/   \/_____/   \/_/\/_/         =" << endl
-////         << "===================================================================================================================" << endl;     
-////        NEEDS A WAY TO PRINT IGNORING ESCAPE CHARACTERS                                                                                        
-//    cout << "====================================================================================================" << endl
-//         << "=       ####### ####         ####  ###### ###  ##  ######     ####  ###### ###  ##                 =" << endl
-//         << "=        ###  ## ###        ##### ###  ## ### ##   ## ###    ##### ###  ## ### ##                  =" << endl
-//         << "=        ######  ###       ## ### ###     #####       ###   ## ### ###     #####                   =" << endl
-//         << "=        ###  ## ###      ##  ### ###     #####       ###  ##  ### ###     #####                   =" << endl
-//         << "=        ###  ## ###     ######## ###     ### ##      ### ######## ###     ### ##                  =" << endl
-//         << "=        ###  ## ###   # ##   ### ###  ## ###  ##  ## ### ##   ### ###  ## ###  ##                 =" << endl
-//         << "=        ######  ####### ##   ###  #####  ###  ##   ####  ##   ###  #####  ###  ##                 =" << endl
-//         << "=                         ###                  ##          ###                  ##                 =" << endl
-//         << "====================================================================================================" << endl;
-//         
-//          
-//           
-//            
-//        
-//          
-//          
-//                    
-//
-//}
-//
-//void GameInfo(Player& player1)
-//{
-//    cout << "= Player Name: " << player1.GetPlayerName() << "          Chip Amount: $" << player1.GetPlayerMoneyTotal() << endl
-//         << "====================================================================================================" << endl;
-//}
-//
-//void RoundScreen(Player& player1, Player& dealer)
-//{
-//    int minLength = dealer.GetPlayerName().length();
-//    int playerNameLength = player1.GetPlayerName().length();
-//    string filler;
-//    
-//    // If players name is shorter than dealers, add space for player name
-//    if(playerNameLength < minLength)
-//    {
-//        string diff1((minLength - playerNameLength), ' ');
-//        filler = diff1;             
-//    }        
-//    cout << "--------------------------------------------------------------" << endl;
-//    cout << filler << player1.GetPlayerName() << "'s Hand: ";
-//    player1.ShowCards();
-//    cout << "           Card Total : " << player1.GetTotalValue()
-//         << "\n--------------------------------------------------------------" << endl;
-//    
-//    filler.clear();
-//    // If players name is longer than dealers, add space for dealer name
-//    if(playerNameLength > minLength)                  
-//    {
-//        string diff2((playerNameLength - minLength), ' ');        
-//        filler = diff2;                    
-//    }    
-//    cout << filler << dealer.GetPlayerName() << "'s Hand: ";
-//    dealer.ShowCards();
-//    cout << "           Card Total : " << dealer.GetTotalValue()
-//         << "\n--------------------------------------------------------------" << endl;
-//}
-//
-//void Delay(double seconds)
-//{	
-//	clock_t start_time = clock();							// Start time for delay
-//	clock_t end_time = seconds * 1000 + start_time;			// End time for delay is seconds * 1000 milliseconds after start time
-//	while(clock() != end_time);								// Loop to simulate delay	
-//} 
-//
+
 //Ask user to create a game(while answer = y) 
 // If yes, Collect player name
 	// Game newGame(Player player1(string playerName) ) 
