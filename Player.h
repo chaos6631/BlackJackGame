@@ -31,18 +31,18 @@ class Player
         // PARAMETERIZED CONSTRUCTOR
         Player(string name, double money = DEFAULT_MONEY_AMOUNT);
         // ACCESSORS
-        void ShowCards()        ;                                // Display all cards as player
-//        void displayCardsAsDealer();                        // Display all cards as dealer
+        void ShowCards()        ;                                           // Display all cards as player
+//        void displayCardsAsDealer();                                      // Display all cards as dealer
         string GetPlayerName() const { return m_playerName; };
-        double GetPlayerMoneyTotal() const { return m_money; };  //OVERRIDE IN DEALER CLASS
-//        int GetNumOfCards() const;                                   // Get the total number of cards in the hand
-        int GetTotalValue() const ;                                 // Get the total value of all the cards in the hand  
+        double GetPlayerMoneyTotal() const { return m_money; };             //OVERRIDE IN DEALER CLASS
+//        int GetNumOfCards() const;                                        // Get the total number of cards in the hand
+        int GetTotalValue() const ;                                         // Get the total value of all the cards in the hand  
 //        bool HasBlackjack();      
         
         // MUTATORS
-        void AddCard(Card newCard)    ;                        // Add a card to the hand
-        void Bet(double amount);                               //OVERRIDE IN DEALER CLASS
-//    	void SplitHand()                               // NOT REQUIRED BUT IS OPTION //OVERRIDE IN DEALER CLASS
+        void AddCard(Card newCard)    ;                                     // Add a card to the hand
+        void Bet(double amount);                                            //OVERRIDE IN DEALER CLASS
+//    	void SplitHand()                                                    // NOT REQUIRED BUT IS OPTION //OVERRIDE IN DEALER CLASS
     	void Stand();
     	void Hit(Card newCard);
     	void DoubleDown(double amount);

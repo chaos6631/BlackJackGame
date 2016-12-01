@@ -12,6 +12,7 @@
 
 #include "Deck.h"
 #include "Player.h"
+#include "Dealer.h"
 //#include "Dealer.h"
 //#include <cstdlib>					// for system()
 //#include <stdexcept>
@@ -29,6 +30,8 @@ using namespace std;
 class BlackJackGame
 {
     public:
+        static const double MINIMUM_BET;
+        
         // default Constructor
         BlackJackGame(){}
         // Parameterized Constructor 
@@ -44,6 +47,12 @@ class BlackJackGame
         Deck m_gameDeck;
 //    	Dealer m_gameDealer;
 };
+
+/*************************
+ FUNCTION DEFINITIONS
+**************************/
+
+const double BlackJackGame::MINIMUM_BET = 5;
 
 BlackJackGame::BlackJackGame(Player& player)
 {

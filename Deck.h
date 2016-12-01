@@ -16,8 +16,7 @@
 //#include <string>					// for string
 //#include <sstream>					// for stringstream
 #include "Card.h"
-#include <algorithm>   
-#include <stack>
+#include <algorithm>  
 #include <vector>
 // Required for Card Symbol Characters
 #include <clocale>
@@ -37,10 +36,10 @@ class Deck {
 	public:	   
         // Stacic Data Members
 	    static const int MAX_CARD_COUNT; 	      // Total number of cards in deck
-        static const int MIN_VALUE_INDEX;     // Minimum index for VALUES and VALUE_CHAR vectors
-		static const int MAX_VALUE_INDEX;    // Maximum index for VALUES and VALUE_CHAR vectors
-	    static const int MIN_SUIT_INDEX;      // Minimum index for SUITS and SUIT_CHARS vectors
-		static const int MAX_SUIT_INDEX;      // Maximum index for SUITS and SUIT_CHARS vectors
+        static const int MIN_VALUE_INDEX;         // Minimum index for VALUES and VALUE_CHAR vectors
+		static const int MAX_VALUE_INDEX;         // Maximum index for VALUES and VALUE_CHAR vectors
+	    static const int MIN_SUIT_INDEX;          // Minimum index for SUITS and SUIT_CHARS vectors
+		static const int MAX_SUIT_INDEX;          // Maximum index for SUITS and SUIT_CHARS vectors
 		
 		static const vector<string> SUITS;
         static const vector<char> SUIT_CHARS;         
@@ -70,7 +69,7 @@ class Deck {
 Deck Class Definitions
  *********************/ 
 //const string StandardPlayingCard::SUITS[] = { "Spades", "Hearts", "Diamonds", "Clubs" };
-
+const int Deck::MAX_CARD_COUNT = 52;
 const int Deck::MIN_VALUE_INDEX = 0;     // Minimum index for VALUES and VALUE_CHAR vectors
 const int Deck::MAX_VALUE_INDEX = 12;    // Maximum index for VALUES and VALUE_CHAR vectors
 const int Deck::MIN_SUIT_INDEX = 0;      // Minimum index for SUITS and SUIT_CHARS vectors

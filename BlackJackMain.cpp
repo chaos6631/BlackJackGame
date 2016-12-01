@@ -40,6 +40,7 @@ using namespace GUI;
  FUNCTION DECLARATIONS
 **************************/
 bool BeginGamePrompt();
+bool CheckBlackjack(Dealer &dealer, Player &player, double playerBet);
 
 const double MINIMUM_BET = 5;
 int main()
@@ -60,7 +61,8 @@ int main()
             cout << "Please enter your name: ";
             cin >> playerName;
             Player player1(playerName);
-            Player dealer("Dealer");
+//            Player dealer("Dealer");
+            Dealer dealer("Dealer");
             
             // Start game :: SHould be added to GameBlackJack class as a method
             Deck gameDeck;  
@@ -99,21 +101,29 @@ int main()
             }                        
             
             // TODO : need to check for blackjack    
-            if(player1.GetTotalValue() == 21 && dealer.GetTotalValue() == 21)
+            if(CheckBlackjack(dealer, player1, playerBet))
             {
-                cout << "Both you and the dealer have BLACKJACK!" << endl
-                     << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
-                //player1.CollectMoney(playerBet);
-            } 
-            else if(player1.GetTotalValue() == 21 && dealer.GetTotalValue() < 21)
-            {
-                cout << "BlackJack!! You win $" << ((playerBet * 2) * 1.5) << endl;
-                //player1.CollectMoney(playerBet);
+                // End Round
             }
             else
             {
-                // continue the round
+                // continue round
             }
+//            if(player1.GetTotalValue() == 21 && dealer.GetTotalValue() == 21)
+//            {
+//                cout << "Both you and the dealer have BLACKJACK!" << endl
+//                     << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+//                //player1.CollectMoney(playerBet);
+//            } 
+//            else if(player1.GetTotalValue() == 21 && dealer.GetTotalValue() < 21)
+//            {
+//                cout << "BlackJack!! You win $" << ((playerBet * 2) * 1.5) << endl;
+//                //player1.CollectMoney(playerBet);
+//            }
+//            else
+//            {
+//                // continue the round
+//            }
             wishToPlay = false;
             // TODO:: make dealer an extension of player class            
            
@@ -170,6 +180,26 @@ bool BeginGamePrompt()
     return play;
 }
 
+bool CheckBlackjack(Dealer &dealer, Player &player, double playerBet)
+{
+    bool roundOver = false;                // true if blackjack was reached by anyone, false if not
+    
+    if(player.GetTotalValue() == 21 && dealer.GetTotalValue() == 21)
+    {
+        cout << "Both you and the dealer have BLACKJACK!" << endl
+             << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+        //player.CollectMoney(playerBet);
+        roundOver = true;
+    } 
+    else if(player.GetTotalValue() == 21 && dealer.GetTotalValue() < 21)
+    {
+        cout << "BlackJack!..... You win $" << ((playerBet * 2) * 1.5) << "!!!!" << endl;
+        //player.CollectMoney(playerBet); ((playerBet * 2) * 1.5)
+        roundOver = true;
+    }
+    
+    return roundOver;                     // Unchanged if no conditional was met
+}
 //Ask user to create a game(while answer = y) 
 // If yes, Collect player name
 	// Game newGame(Player player1(string playerName) ) 
