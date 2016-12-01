@@ -40,12 +40,18 @@ using namespace GUI;
  FUNCTION DECLARATIONS
 **************************/
 bool BeginGamePrompt();
+double BettingPrompt(double minimumBet, double maximumBet);
 bool CheckBlackjack(Dealer &dealer, Player &player, double playerBet);
+bool ContinuePlayingPrompt();
+void DealCards(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck);
+void PlayerRound(Player &gamePlayer, Deck &gameDeck);
+
 
 const double MINIMUM_BET = 5;
 int main()
 {
 	bool wishToPlay = true;
+	double playerBet;
     srand(time(0));                        // Needed for random_shuffle to work should only be implemented once, so in blackjack.cpp main
     SetConsoleOutputCP(65001);             // Code Page must be set to this for Unicode characters to work properly
     DisplayBanner();
@@ -73,42 +79,35 @@ int main()
             GameInfo(player1);  
             
             // Betting Prompt :: SHould be added to GameBlackJack class as a method and called in the GameBlackJack::PlayRound() method
-            cout << "\n(Minimum bet is $5, you may increase in $5 increments)"
-                 << "Place your bet: $";
-            double playerBet = GetValidDouble(MINIMUM_BET, player1.GetPlayerMoneyTotal());
+            playerBet = BettingPrompt(MINIMUM_BET, player1.GetPlayerMoneyTotal());
             player1.Bet(playerBet);
             
-            cout << "Dealer will now deal cards....." << endl;
-            Delay(1);
-            cout << "test";
-            for(int i = 1;i <= 2; i++)
-            {
-                player1.AddCard(gameDeck.RemoveNextCard());
-                Delay(0.5);
-                GameScreen(player1, dealer);
-                if(i == 1)
-                {
-                    Card firstCard = gameDeck.RemoveNextCard();
-                    firstCard.m_isFaceUp = false; 
-                    dealer.AddCard(firstCard);
-                }
-                else
-                {
-                    dealer.AddCard(gameDeck.RemoveNextCard());
-                }                
-                Delay(0.5);
-                GameScreen(player1, dealer);
-            }                        
+            // Deal cards
+            DealCards(player1, dealer, gameDeck);
             
             // TODO : need to check for blackjack    
             if(CheckBlackjack(dealer, player1, playerBet))
             {
                 // End Round
+                if(ContinuePlayingPrompt() == true)
+                {
+                    // play round
+                    cout << "\nBegin next round......" << endl;
+                }
+                else
+                {
+                    // exit game
+                    cout << "\nEnding game......" << endl;
+                }
             }
             else
             {
-                // continue round
+                // play round
+                cout << "\nBegin next round......" << endl;
+                
             }
+            PlayerRound(player1, gameDeck);
+            
 //            if(player1.GetTotalValue() == 21 && dealer.GetTotalValue() == 21)
 //            {
 //                cout << "Both you and the dealer have BLACKJACK!" << endl
@@ -180,6 +179,15 @@ bool BeginGamePrompt()
     return play;
 }
 
+double BettingPrompt(double minimumBet, double maximumBet)
+{
+    double betAmount;
+    cout << "\n(Minimum bet is $5, you may increase in $5 increments)"
+         << "Place your bet: $";
+    betAmount = GetValidDouble(minimumBet, maximumBet);                
+    return betAmount;
+}
+
 bool CheckBlackjack(Dealer &dealer, Player &player, double playerBet)
 {
     bool roundOver = false;                // true if blackjack was reached by anyone, false if not
@@ -197,9 +205,114 @@ bool CheckBlackjack(Dealer &dealer, Player &player, double playerBet)
         //player.CollectMoney(playerBet); ((playerBet * 2) * 1.5)
         roundOver = true;
     }
+    else
+    {
+        cout << "\nNobody has Blackjack!!......" << endl;
+    }
     
     return roundOver;                     // Unchanged if no conditional was met
 }
+
+bool ContinuePlayingPrompt()
+{    
+	bool play = true;
+	bool valid = false;
+    char result;
+    do
+    {
+        cout << "\nWould you like to continue playing(y/n)?";
+        cin >> result;        
+        
+        result = toupper(result);
+        if(result == 'Y')
+        {
+            play = true;
+            valid = true;
+        }
+        else if(result == 'N')
+        {
+            cout << "Ok, see ya later!!" << endl;
+            play = false;
+            valid = true;
+        }
+        else
+        {
+            cerr << "Please enter 'y' for yes, 'n' for no" << endl;
+        }
+    }
+    while(valid == false);
+	
+    
+    return play;
+}
+
+void DealCards(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
+{
+    cout << "Dealer will now deal cards....." << endl;
+    Delay(1);
+    //cout << "test";
+    for(int cardsPerPlayer = 1;cardsPerPlayer <= 2; cardsPerPlayer++)
+    {
+        gamePlayer.AddCard(gameDeck.RemoveNextCard());
+        Delay(0.5);
+        GameScreen(gamePlayer, gameDealer);
+        if(cardsPerPlayer == 1)
+        {
+            Card firstCard = gameDeck.RemoveNextCard();
+            firstCard.m_isFaceUp = false; 
+            gameDealer.AddCard(firstCard);
+        }
+        else
+        {
+            gameDealer.AddCard(gameDeck.RemoveNextCard());
+        }                
+        Delay(0.5);
+        GameScreen(gamePlayer, gameDealer);
+    }                        
+}
+
+void PlayerRound(Player &gamePlayer, Deck &gameDeck)
+{
+    bool play = true;
+	bool valid = false;         // for valid input
+    char result;
+        
+    cout << "What would you like to do: " << endl
+         << "(H) Hit\n(P) Stand\n(S) Split\n(D) Double-Down)" << endl;             
+    do
+    {                     
+        cout << "Choice: ";             
+        cin >> result;        
+        
+        result = toupper(result);
+        switch(result)
+        {
+            case 'H' : {
+                cout << "You chose H"; // run the hit method                            
+                valid = true;   
+                break;
+            }                        
+            case 'P' : {
+                cout << "You chose P"; // run the stand method
+                valid = true; 
+                break;
+            }                        
+            case 'S' : {
+                cout << "You chose S"; // run the split method
+                valid = true; 
+                break;
+            }                        
+            case 'D' : {
+                cout << "You chose D"; // run the ouble down method
+                valid = true; 
+                break;
+            }                        
+            default : cerr << "Please enter H, P, S, or D" << endl;                          
+        }   
+    }
+    while(valid == false);
+}
+
 //Ask user to create a game(while answer = y) 
 // If yes, Collect player name
 	// Game newGame(Player player1(string playerName) ) 
