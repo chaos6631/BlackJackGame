@@ -27,7 +27,7 @@ class Player
         // STATIC DATA MEMBERS
         static const double DEFAULT_MONEY_AMOUNT;
         // DEFAULT CONSTRUCTOR
-        Player(): m_playerName("Player1"), m_money(DEFAULT_MONEY_AMOUNT) {}
+        Player(): m_playerName("Player1"), m_money(DEFAULT_MONEY_AMOUNT), m_currentBet(0) {}
         // PARAMETERIZED CONSTRUCTOR
         Player(string name, double money = DEFAULT_MONEY_AMOUNT);
         // ACCESSORS
@@ -35,6 +35,7 @@ class Player
 //        void displayCardsAsDealer();                                      // Display all cards as dealer
         string GetPlayerName() const { return m_playerName; };
         double GetPlayerMoneyTotal() const { return m_money; };             //OVERRIDE IN DEALER CLASS
+        double GetCurrentBet() const { return m_currentBet; }
 //        int GetNumOfCards() const;                                        // Get the total number of cards in the hand
         int GetTotalValue() const ;                                         // Get the total value of all the cards in the hand  
 //        bool HasBlackjack();      
@@ -50,9 +51,11 @@ class Player
         string m_playerName;
         vector<Card> m_hand;                           // Vector containing card objects that make up the hand
     private:      
-    	double m_money;    	
+    	double m_money;                                // Total funds available
+        double m_currentBet;	                       // Current bet amount for the round
 //    	vector<Card> m_split hand;                     // NOT REQUIRED BUT IS OPTION
-//    	bool m_hasSplit                                // NOT REQUIRED BUT IS OPTION   	
+//    	bool m_hasSplit                                // NOT REQUIRED BUT IS OPTION  
+//        double m_splitBet;                           // the amount of original bet 	
 };
 
 
@@ -67,6 +70,7 @@ Player::Player(string name, double money)
 {
     m_playerName = name;    
     m_money = money;
+    m_currentBet = 0;
 }
 
 void Player::ShowCards()
@@ -106,6 +110,7 @@ void Player::Bet(double amount)
     if(amount <= maxBetAmount && amount >= 0)
     {
         m_money -= amount;
+        m_currentBet = amount;
         cout << "You have bet $" << amount << endl;
     }
     else
@@ -121,7 +126,7 @@ void Player::Stand()
 
 void Player::Hit(Card newCard)
 {
-    cout << "You have chosen to Hit!" << endl;
+    //cout << "You have chosen to Hit!" << endl;
     m_hand.push_back(newCard);
 }
 void Player::DoubleDown(double amount)

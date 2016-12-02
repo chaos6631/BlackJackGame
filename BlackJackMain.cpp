@@ -44,7 +44,7 @@ double BettingPrompt(double minimumBet, double maximumBet);
 bool CheckBlackjack(Dealer &dealer, Player &player, double playerBet);
 bool ContinuePlayingPrompt();
 void DealCards(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck);
-void PlayerRound(Player &gamePlayer, Deck &gameDeck);
+void ChoicePrompt(Player &gamePlayer, Deck &gameDeck);
 
 
 const double MINIMUM_BET = 5;
@@ -79,7 +79,7 @@ int main()
             GameInfo(player1);  
             
             // Betting Prompt :: SHould be added to GameBlackJack class as a method and called in the GameBlackJack::PlayRound() method
-            playerBet = BettingPrompt(MINIMUM_BET, player1.GetPlayerMoneyTotal());
+            playerBet = BettingPrompt(MINIMUM_BET, player1.GetPlayerMoneyTotal());            
             player1.Bet(playerBet);
             
             // Deal cards
@@ -106,7 +106,9 @@ int main()
                 cout << "\nBegin next round......" << endl;
                 
             }
-            PlayerRound(player1, gameDeck);
+            // Check if player has a total of 9,10,11 then ask for DoubleDown doubling initial bet and player will receive one more card
+            //       player can also split if both cards are 5's and play it out normally
+            ChoicePrompt(player1, gameDeck);
             
 //            if(player1.GetTotalValue() == 21 && dealer.GetTotalValue() == 21)
 //            {
@@ -271,12 +273,12 @@ void DealCards(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
     }                        
 }
 
-void PlayerRound(Player &gamePlayer, Deck &gameDeck)
+void ChoicePrompt(Player &gamePlayer, Deck &gameDeck)
 {
     bool play = true;
 	bool valid = false;         // for valid input
-    char result;
-        
+    char result;   
+    
     cout << "What would you like to do: " << endl
          << "(H) Hit\n(P) Stand\n(S) Split\n(D) Double-Down)" << endl;             
     do
@@ -288,25 +290,26 @@ void PlayerRound(Player &gamePlayer, Deck &gameDeck)
         switch(result)
         {
             case 'H' : {
-                cout << "You chose H"; // run the hit method                            
+                cout << "You chose to HIT"; // run the hit method  
+                gamePlayer.Hit(gameDeck.RemoveNextCard());                          
                 valid = true;   
                 break;
             }                        
             case 'P' : {
-                cout << "You chose P"; // run the stand method
+                cout << "You chose to STAND"; // run the stand method
+                gamePlayer.Stand();   
                 valid = true; 
                 break;
             }                        
             case 'S' : {
-                cout << "You chose S"; // run the split method
+                cout << "You chose to SPLIT"; // run the split method
+                // splitting splits the cards and the initial bet amount is taken again for the split hand
+                // then the two hands are played with the original hand played first and then the split hand
+//                gamePlayer.DoubleDown(gamePlayer.GetCurrentBet())
                 valid = true; 
                 break;
-            }                        
-            case 'D' : {
-                cout << "You chose D"; // run the ouble down method
-                valid = true; 
-                break;
-            }                        
+            }                       
+                               
             default : cerr << "Please enter H, P, S, or D" << endl;                          
         }   
     }
