@@ -35,7 +35,7 @@ class Dealer : public Player
         // ACCESSORS
         
         // MUTATORS
-        void Play();                     // Method used to play a round for the dealer, determining which moves are to be made based on cards
+        void FlipInitialCard();                     // Method used to flip the initial card dealt to the dealer face up
 };
 
 
@@ -50,10 +50,9 @@ Dealer::Dealer(string name)
     m_playerName = name;        
 }
 
-void Dealer::Play()
+void Dealer::FlipInitialCard()
 {
-    // Check card values then determine what move the dealer must make
-    // If value is less than 17 dealer must hit
-    // If value is greater or equal to 17 dealer must stand
+    m_hand[0].m_isFaceUp = true;
 }
+
 #endif

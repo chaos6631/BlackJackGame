@@ -31,31 +31,31 @@ class Player
         // PARAMETERIZED CONSTRUCTOR
         Player(string name, double money = DEFAULT_MONEY_AMOUNT);
         // ACCESSORS
-        void ShowCards()        ;                                           // Display all cards as player
-//        void displayCardsAsDealer();                                      // Display all cards as dealer
+        void ShowCards();                                                 // Display all cards as player
         string GetPlayerName() const { return m_playerName; };
-        double GetPlayerMoneyTotal() const { return m_money; };             //OVERRIDE IN DEALER CLASS
-        double GetCurrentBet() const { return m_currentBet; }
-//        int GetNumOfCards() const;                                        // Get the total number of cards in the hand
-        int GetTotalValue() const ;                                         // Get the total value of all the cards in the hand  
-//        bool HasBlackjack();      
+        double GetPlayerMoneyTotal() const { return m_money; };           //OVERRIDE IN DEALER CLASS
+        double GetCurrentBet() const { return m_currentBet; };
+        int GetTotalValue() const ;                                       // Get the total value of all the cards in the hand  
+        bool CanSplit();                                                  // True if players first two cards are same face char, false if not
+        //int GetNumOfCards() const;                                      // Get the total number of cards in the hand
         
         // MUTATORS
-        void AddCard(Card newCard)    ;                                     // Add a card to the hand
-        void Bet(double amount);                                            //OVERRIDE IN DEALER CLASS
-//    	void SplitHand()                                                    // NOT REQUIRED BUT IS OPTION //OVERRIDE IN DEALER CLASS
+        void AddCard(Card newCard)    ;                                   // Add a card to the hand
+        void Bet(double amount);                                          //OVERRIDE IN DEALER CLASS
     	void Stand();
     	void Hit(Card newCard);
     	void DoubleDown(double amount);
+    	void ClearHand();
+    	void CollectMoney(double amount);
+    	//void SplitHand()                                                // NOT REQUIRED BUT IS OPTION //OVERRIDE IN DEALER CLASS
     protected:
         string m_playerName;
         vector<Card> m_hand;                           // Vector containing card objects that make up the hand
     private:      
     	double m_money;                                // Total funds available
         double m_currentBet;	                       // Current bet amount for the round
-//    	vector<Card> m_split hand;                     // NOT REQUIRED BUT IS OPTION
-//    	bool m_hasSplit                                // NOT REQUIRED BUT IS OPTION  
-//        double m_splitBet;                           // the amount of original bet 	
+//    	vector<Card> m_split hand;                     // NOT REQUIRED BUT IS OPTION    	
+//      double m_splitBet;                             // the amount of original bet 	
 };
 
 
@@ -91,12 +91,32 @@ void Player::ShowCards()
 
 int Player::GetTotalValue() const
 {
-    int count = 0;
+    int total = 0;
     for(int i = 0;i < m_hand.size();i++)
     {       
-        count += m_hand.at(i).GetValue();
+        if(total > 10 && m_hand[i].GetValue() == 11)
+		{
+			total += 1;
+		}
+		else
+		{
+			total += m_hand[i].GetValue();
+		}
     }
-    return count;
+    return total;
+}
+
+bool Player::CanSplit()
+{
+    bool canSplit = false;
+    if(m_hand.size() > 0)
+    {
+        if(m_hand[0].GetSuitChar() == m_hand[1].GetSuitChar())
+        {
+            canSplit = true;
+        }
+    }
+    return canSplit;
 }
 
 void Player::AddCard(Card newCard)
@@ -129,6 +149,7 @@ void Player::Hit(Card newCard)
     //cout << "You have chosen to Hit!" << endl;
     m_hand.push_back(newCard);
 }
+
 void Player::DoubleDown(double amount)
 {
     double maxBetAmount = m_money;
@@ -142,4 +163,18 @@ void Player::DoubleDown(double amount)
         throw invalid_argument("The amount bet can't be more than the player has available or less than zero!!");
     }
 }
+
+void Player::ClearHand()
+{
+    m_hand.clear();
+}
+
+void Player::CollectMoney(double amount)
+{
+    m_money += amount;
+}
+
+
+
+
 #endif

@@ -116,14 +116,21 @@ void Deck::FillDeck() // **PARAM int DeckCount to be added
 //	{
 //	    
 //    }
-	//Set suit attributes
-	for(int j = MIN_SUIT_INDEX; j <= MAX_SUIT_INDEX; j++) {
-		suit = SUITS[j];
-		suitChar = SUIT_CHARS[j];
+	//Check if there are any cards left in the deck, if so remove them
+	if(m_cards.size() > 0)
+	{
+	    m_cards.clear();
+    }
+    //Set suit attributes
+	for(int suitIndex = MIN_SUIT_INDEX; suitIndex <= MAX_SUIT_INDEX; suitIndex++) 
+    {
+		suit = SUITS[suitIndex];
+		suitChar = SUIT_CHARS[suitIndex];
 		// Set value attributes
-		for(int k = MIN_VALUE_INDEX; k <= MAX_VALUE_INDEX; k++) {
-			value = VALUES[k];
-			valueChar = VALUE_CHAR[k];
+		for(int valueIndex = MIN_VALUE_INDEX; valueIndex <= MAX_VALUE_INDEX; valueIndex++) 
+        {
+			value = VALUES[valueIndex];
+			valueChar = VALUE_CHAR[valueIndex];
 			Card newCard(value, valueChar, suit, suitChar);	// Create newcard
 	        m_cards.push_back(newCard);						// Add card to deck	        
 		}

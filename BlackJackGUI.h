@@ -10,7 +10,7 @@
 #define _BLACKJACKGUI
 
 #include "Player.h"
-//#include "Dealer.h"
+#include "Dealer.h"
 #include <iostream>
 #include <iomanip> 					// for output formatting
 #include <string>					// for string
@@ -51,7 +51,7 @@ namespace GUI
 	 * @param  dealer: The dealer player object to be referenced
 	 * @returns void
 	*/
-    void GameScreen(Player& player1, Player& dealer);
+    void GameScreen(Player& player1, Dealer& dealer);
     
     /**	RoundScreen function
 	 * 
@@ -60,7 +60,7 @@ namespace GUI
 	 * @param  dealer: The dealer player object to be referenced
 	 * @return A validated int input by the user.
 	*/
-    void RoundScreen(Player& player1, Player& dealer);
+    void RoundScreen(Player& player1, Dealer& dealer);
     
     /*************************
      FUNCTION DEFINITIONS
@@ -107,7 +107,7 @@ namespace GUI
              << "====================================================================================================" << endl;
     }
     
-    void GameScreen(Player& player1, Player& dealer)
+    void GameScreen(Player& player1, Dealer& dealer)
     {
         system("CLS");
         DisplayBanner();
@@ -115,12 +115,20 @@ namespace GUI
         RoundScreen(player1, dealer);
     }
     
-    void RoundScreen(Player& player1, Player& dealer)
+    void RoundScreen(Player& player1, Dealer& dealer)
     {
         int minLength = dealer.GetPlayerName().length();
         int playerNameLength = player1.GetPlayerName().length();
         string filler;
-        
+//        stringstream dealerTotal;
+//        if(dealer.IsDealersTurn() == true)
+//        {
+//            dealerTotal << dealer.GetTotalValue();
+//        }
+//        else
+//        {
+//            dealerTotal << "???";
+//        }    
         // If players name is shorter than dealers, add space for player name
         if(playerNameLength < minLength)
         {
@@ -141,8 +149,9 @@ namespace GUI
             filler = diff2;                    
         }    
         cout << filler << dealer.GetPlayerName() << "'s Hand: ";
-        dealer.ShowCards();
-        cout << "           Card Total : " << dealer.GetTotalValue()
+        dealer.ShowCards();     
+           
+        cout << "           Card Total : " //<< dealerTotal.str()
              << "\n--------------------------------------------------------------" << endl;
     }
 }
