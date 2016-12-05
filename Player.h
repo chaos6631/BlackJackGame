@@ -92,17 +92,74 @@ void Player::ShowCards()
 int Player::GetTotalValue() const
 {
     int total = 0;
+    int aceCount = 0;
     for(int i = 0;i < m_hand.size();i++)
-    {       
-        if(total > 10 && m_hand[i].GetValue() == 11)
-		{
-			total += 1;
-		}
+    {     
+        if(m_hand[i].GetValue() == 1)
+        {
+            aceCount += 1;
+        }          
 		else
 		{
 			total += m_hand[i].GetValue();
 		}
+				
+        if(aceCount == 1)
+        {
+            if(total <= 10)
+            {
+                total += 11;
+            }
+            else
+            {
+                total += 1;    
+            }
+        }
+        if(aceCount == 2)
+        {
+            if(total <= 10 && (total + 12) <= 21)
+            {
+                total += 12;
+            }
+            else
+            {
+                total += 2;    
+            }
+        }
+        if(aceCount == 3)
+        {
+            if(total <= 10 && (total + 13) <= 21)
+            {
+                total += 13;
+            }
+            else
+            {
+                total += 3;    
+            }
+        }
+        if(aceCount == 4)
+        {
+            if(total <= 10 && (total + 14) <= 21)
+            {
+                total += 14;
+            }
+            else
+            {
+                total += 4;    
+            }
+        }
     }
+//    for(int i = 0;i < m_hand.size();i++)
+//    {       
+//        if(total > 10 && m_hand[i].GetValue() == 11)
+//		{
+//			total += 1;
+//		}
+//		else
+//		{
+//			total += m_hand[i].GetValue();
+//		}
+//    }
     return total;
 }
 
@@ -111,7 +168,7 @@ bool Player::CanSplit()
     bool canSplit = false;
     if(m_hand.size() > 0)
     {
-        if(m_hand[0].GetSuitChar() == m_hand[1].GetSuitChar())
+        if(m_hand[0].GetValueChar() == m_hand[1].GetValueChar())
         {
             canSplit = true;
         }
@@ -151,12 +208,14 @@ void Player::Hit(Card newCard)
 }
 
 void Player::DoubleDown(double amount)
-{
+{    
     double maxBetAmount = m_money;
+        
+    if(m_currentBet <= maxBetAmount && m_currentBet >= 0)
     if(amount <= maxBetAmount && amount >= 0)
     {
-        m_money -= amount;
-        cout << "You have chosen to double down with a bet of $" << (amount * 2) << endl;
+        m_money -= m_currentBet;
+        m_currentBet += m_currentBet;        
     }
     else
     {

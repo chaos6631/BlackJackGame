@@ -78,7 +78,7 @@ const int Deck::MAX_SUIT_INDEX = 3;      // Maximum index for SUITS and SUIT_CHA
 // These values depend on the type of Deck used, must be changed if different style of deck is required
 const vector<string> Deck::SUITS = { "Hearts", "Diamonds", "Spades", "Clubs"};
 const vector<char> Deck::SUIT_CHARS = {'H', 'D', 'S', 'C'}; 
-const vector<int> Deck::VALUES =      {2,3,4,5,6,7,8,9,10,10,10,10,11}; // VALUES order corresponds with VALUE_CHAR order
+const vector<int> Deck::VALUES =      {2,3,4,5,6,7,8,9,10,10,10,10,1}; // VALUES order corresponds with VALUE_CHAR order
 const vector<char> Deck::VALUE_CHAR = {'2','3','4','5','6','7','8','9','X','J','Q','K','A'}; // X represents 10
 
 // Default constructor

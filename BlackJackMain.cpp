@@ -51,6 +51,7 @@ bool PlayerSplitCheck(Player &gamePlayer);
 void PlayerRound(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck);
 void DealerRound(Dealer &gameDealer, Player &gamePlayer, Deck &gameDeck);
 void RoundSettlement(Player &player1, Dealer &dealer);
+bool YesNoChoicePrompt(string message);
 
 /*************************
  GLOBALS
@@ -171,7 +172,7 @@ void RoundSettlement(Player &player1, Dealer &dealer)
     // Player has 21 and wins
     if(player1.GetTotalValue() == 21 && dealer.GetTotalValue() < 21)
     {
-        cout << "You have 21!! You win $" << (player1.GetCurrentBet() * 2) << endl;
+        cout << "You have 21!! You win $" << (player1.GetCurrentBet() * 2) << endl;           
         player1.CollectMoney(player1.GetCurrentBet() * 2);
     }
     // TIE of 21
@@ -189,16 +190,29 @@ void RoundSettlement(Player &player1, Dealer &dealer)
         player1.CollectMoney(player1.GetCurrentBet());
     }
     // Player beats dealer
-    else if(player1.GetTotalValue() < 21 && player1.GetTotalValue() > dealer.GetTotalValue())
+    else if(player1.GetTotalValue() <= 21 && player1.GetTotalValue() > dealer.GetTotalValue())
     {
         cout << "You have " << player1.GetTotalValue() << " and the dealer has " << dealer.GetTotalValue() << endl;
         cout << "You beat the dealer!! You win $" << (player1.GetCurrentBet() * 2) << endl;
         player1.CollectMoney(player1.GetCurrentBet() * 2);
-    }                
-    else
+    }
+    // Dealer beats player
+    else if(dealer.GetTotalValue() <= 21 && player1.GetTotalValue() < dealer.GetTotalValue())       
     {
         cout << "Dealer has " << dealer.GetTotalValue() << ", Sorry you lost!!" << endl;
         // continue the round
+    } 
+    // Dealer beats player
+    else if(dealer.GetTotalValue() <= 21 && player1.GetTotalValue() <= 21 && player1.GetTotalValue() < dealer.GetTotalValue())       
+    {
+        cout << "Dealer has " << dealer.GetTotalValue() << ", Sorry you lost!!" << endl;
+        // continue the round
+    }             
+    else
+    {
+        cout << "You have " << player1.GetTotalValue() << " and the dealer has BUSTED with " << dealer.GetTotalValue() << ".\n";
+        cout << "You beat the dealer!! You win $" << (player1.GetCurrentBet() * 2) << endl;
+        player1.CollectMoney(player1.GetCurrentBet() * 2);
     }
     
     
@@ -213,6 +227,7 @@ void DealerRound(Dealer &gameDealer, Player &gamePlayer, Deck &gameDeck)
         {
             gameDealer.Hit(gameDeck.RemoveNextCard());
             GameScreen(gamePlayer, gameDealer);
+            Delay(1);
         }
         else if(gameDealer.GetTotalValue() >= 17)
         {
@@ -228,7 +243,9 @@ void PlayerRound(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
     //       player can also split if both cards are 5's and play it out normally
     if(PlayerDoubleDownCheck(gamePlayer))
     {     // True if player is doubling down              
-        
+        gamePlayer.Hit(gameDeck.RemoveNextCard());
+        GameScreen(gamePlayer, gameDealer);            // Reload screen
+        Delay(1);
     }
     else // False if not going to double down
     {
@@ -253,11 +270,13 @@ void PlayerHitStandCheck(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
     {   
         do
         {
+            //GameMessage("\nWould you like to HIT or STAND(H/S)? ");
             cout << "Would you like to HIT or STAND(H/S)? ";
             cin >> result;   
             result = toupper(result);
             if(result == 'H')
             {      
+                //GameMessage("\nYou chose to HIT!\n")
                 cout << "You chose to HIT!" << endl;
                 gamePlayer.Hit(gameDeck.RemoveNextCard());
                 //continueHitting = true;
@@ -265,12 +284,14 @@ void PlayerHitStandCheck(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
             }
             else if(result == 'S')
             {  
+                //GameMessage("\nYou chose to STAND!\n")
                 cout << "You chose to STAND!" << endl;    
                 continueHitting = false;             
                 valid = true;
             }
             else
             {
+                //GameMessage("\nPlease enter 'H' for HIT, 'S' for STAND.\n");
                 cerr << "Please enter 'H' for HIT, 'S' for STAND." << endl;
             }
         }
@@ -280,11 +301,13 @@ void PlayerHitStandCheck(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
         //if value is greater than 21, inform of bust
         if(gamePlayer.GetTotalValue() > 21)
         {
+            //GameMessage("\nSorry, looks like you busted!!\n");
             cout << "\nSorry, looks like you busted!!" << endl;      // might do this outside of function
             continueHitting = false;    
         }   
         else if(gamePlayer.GetTotalValue() == 21)  
         {
+            //GameMessage("\nLooks like you got 21!!\n");
             cout << "\nLooks like you got 21!!" << endl;     // might do this outside of function
             continueHitting = false;
         }  
@@ -296,31 +319,13 @@ bool PlayerSplitCheck(Player &gamePlayer)
 {
     bool splitting = false;                                   // True if player is splitting, false if not
     if(gamePlayer.CanSplit())  
-    {  
-        bool valid = false;                                   // True if user input is valid, false if not
-        char result;               
-        do
+    {           
+        if(YesNoChoicePrompt("Would you like to split your hand(y/n)? "))
         {
-            cout << "Would you like to split your hand(y/n)? ";
-            cin >> result;   
-            result = toupper(result);
-            if(result == 'Y')
-            {      
-                cout << "You chose to split!" << endl;
-                // call to splithand() in player class
-                splitting = true;
-                valid = true;
-            }
-            else if(result == 'N')
-            {                
-                valid = true;
-            }
-            else
-            {
-                cerr << "Please enter 'y' for yes, 'n' for no" << endl;
-            }
-        }
-        while(valid == false);        
+            //GameMessage("\nYou chose to split!\n");
+            // call to splithand() in player class
+            splitting = true;
+        }            
     }
     
     return splitting;
@@ -328,34 +333,18 @@ bool PlayerSplitCheck(Player &gamePlayer)
 
 bool BeginGamePrompt()
 {    
-	bool play = true;
-	bool valid = false;
-    char result;
-    do
+	bool play = false;
+
+    if(YesNoChoicePrompt("\nWould you like to play a game of Blackjack(y/n)?"))
     {
-        cout << "\nWould you like to play a game of Blackjack(y/n)?";
-        cin >> result;        
-        
-        result = toupper(result);
-        if(result == 'Y')
-        {
-            play = true;
-            valid = true;
-        }
-        else if(result == 'N')
-        {
-            cout << "That's too bad, maybe next time!! See ya......." << endl;
-            play = false;
-            valid = true;
-        }
-        else
-        {
-            cerr << "Please enter 'y' for yes, 'n' for no" << endl;
-        }
+        play = true;
     }
-    while(valid == false);
-	
-    
+    else
+    {
+        //GameMessage("\nThat's too bad, maybe next time!! See ya.......\n");      //NOT CREATED YET
+        cout << "\nThat's too bad, maybe next time!! See ya.......\n" << endl;
+        play = false;
+    }
     return play;
 }
 
@@ -454,34 +443,51 @@ void DealCards(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
 bool PlayerDoubleDownCheck(Player &gamePlayer)
 {
     bool doublingDown = false;                // True if player is doubling down, false if not
-    bool valid = false;                       // True if user input is valid, false if not
-    char result;
+    
     if(gamePlayer.GetTotalValue() >= 9 && gamePlayer.GetTotalValue() <= 11)
-    {        
-        do
+    {     
+        if(YesNoChoicePrompt("\nWould you like to Double-Down(y/n)? "))   
         {
-            cout << "Would you like to Double-Down(y/n)? ";
-            cin >> result;      
+            //string message = "You have chosen to double down with a bet of $" + gamePlayer.GetCurrentBet() + "\n";
+            //GameMessage(message);
             
-            result = toupper(result);
-            if(result == 'Y')
-            {      
-                cout << "You chose to Double-Down!" << endl;
-                doublingDown = true;
-                valid = true;
-            }
-            else if(result == 'N')
-            {                
-                valid = true;
-            }
-            else
-            {
-                cerr << "Please enter 'y' for yes, 'n' for no" << endl;
-            }
-        }
-        while(valid == false);        
+            gamePlayer.DoubleDown((gamePlayer.GetCurrentBet()));
+            cout << "You have chosen to double down with a bet of $" << gamePlayer.GetCurrentBet() << endl;
+            doublingDown = true;
+        }        
     }
     return doublingDown;
+}
+
+// GUI Function
+bool YesNoChoicePrompt(string message)
+{
+    bool answer = false;                      // True if player chooses Yes, false if No
+    bool valid = false;                       // True if user input is valid, false if not
+    char result;
+          
+    do
+    {
+        cout << message;
+        cin >> result;      
+        
+        result = toupper(result);
+        if(result == 'Y')
+        {                  
+            answer = true;
+            valid = true;
+        }
+        else if(result == 'N')
+        {                
+            valid = true;
+        }
+        else
+        {
+            cerr << "Please enter 'y/Y' for yes, 'n/N' for no" << endl;
+        }
+    }
+    while(valid == false);    
+    return answer;
 }
 //Ask user to create a game(while answer = y) 
 // If yes, Collect player name
