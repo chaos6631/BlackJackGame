@@ -8,8 +8,8 @@
 - for all game functions replace couts with strings that are passed to GameMessage so that all screen output runs through the GUI class.
 
 
-1. double-down
-2. split hand
+
+2. split hand ?? not sure if finished yet, haven't been able to get a hand eleigible to split
 3. multiple decks need
 4. game saving
 5. move all game functions to the game class

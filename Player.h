@@ -31,14 +31,14 @@ class Player
         // PARAMETERIZED CONSTRUCTOR
         Player(string name, double money = DEFAULT_MONEY_AMOUNT);
         // ACCESSORS
-        void ShowCards();                                                 // Display all cards as player
+        void ShowCards() const;                                           // Display all cards in the regular hand     
+        void ShowSplitCards() const;                                      // Display all cards in the split hand         
         string GetPlayerName() const { return m_playerName; };
         double GetPlayerMoneyTotal() const { return m_money; };           //OVERRIDE IN DEALER CLASS
         double GetCurrentBet() const { return m_currentBet; };
-        int GetTotalValue() const ;                                       // Get the total value of all the cards in the hand  
+        int GetTotalValue() const ;                                       // Get the total value of all the cards in the hand   
+        int SplitTotalValue() const;                                      // Get the total value of all the cards in the split hand  
         bool CanSplit();                                                  // True if players first two cards are same face char, false if not
-        //int GetNumOfCards() const;                                      // Get the total number of cards in the hand
-        
         // MUTATORS
         void AddCard(Card newCard)    ;                                   // Add a card to the hand
         void Bet(double amount);                                          //OVERRIDE IN DEALER CLASS
@@ -46,16 +46,18 @@ class Player
     	void Hit(Card newCard);
     	void DoubleDown(double amount);
     	void ClearHand();
-    	void CollectMoney(double amount);
-    	//void SplitHand()                                                // NOT REQUIRED BUT IS OPTION //OVERRIDE IN DEALER CLASS
+    	void CollectMoney(double amount);    	
+    	void SplitHand();                                                 // NOT REQUIRED BUT IS OPTION //OVERRIDE IN DEALER CLASS        
     protected:
         string m_playerName;
-        vector<Card> m_hand;                           // Vector containing card objects that make up the hand
+        vector<Card> m_hand;                                              // Vector containing card objects that make up the hand
+        
+        
     private:      
     	double m_money;                                // Total funds available
         double m_currentBet;	                       // Current bet amount for the round
-//    	vector<Card> m_split hand;                     // NOT REQUIRED BUT IS OPTION    	
-//      double m_splitBet;                             // the amount of original bet 	
+    	vector<Card> m_splitHand;                     // NOT REQUIRED BUT IS OPTION    	
+        double m_splitBet;                             // the amount of original bet 	
 };
 
 
@@ -73,7 +75,7 @@ Player::Player(string name, double money)
     m_currentBet = 0;
 }
 
-void Player::ShowCards()
+void Player::ShowCards() const
 {
     Card card;                            // Create temp card used to display card values    
 
@@ -82,7 +84,23 @@ void Player::ShowCards()
         card = m_hand.at(i);
         cout << " | ";
         card.ShowCardShortDetails();
-        if(i == (m_hand.size() -1))
+        if(i == (m_hand.size() - 1))
+        {
+            cout << " | ";    
+        }        
+    }  
+}
+
+void Player::ShowSplitCards() const
+{
+    Card card;                            // Create temp card used to display card values    
+
+    for(int i = 0; i < m_splitHand.size(); i++)
+    {
+        card = m_splitHand.at(i);
+        cout << " | ";
+        card.ShowCardShortDetails();
+        if(i == (m_splitHand.size() - 1))
         {
             cout << " | ";    
         }        
@@ -92,7 +110,8 @@ void Player::ShowCards()
 int Player::GetTotalValue() const
 {
     int total = 0;
-    int aceCount = 0;
+    int aceCount = 0;    
+    //cout << "checking total\n";
     for(int i = 0;i < m_hand.size();i++)
     {     
         if(m_hand[i].GetValue() == 1)
@@ -103,8 +122,8 @@ int Player::GetTotalValue() const
 		{
 			total += m_hand[i].GetValue();
 		}
-				
-        if(aceCount == 1)
+    }    
+    if(aceCount == 1)
         {
             if(total <= 10)
             {
@@ -147,20 +166,86 @@ int Player::GetTotalValue() const
             {
                 total += 4;    
             }
-        }
-    }
-//    for(int i = 0;i < m_hand.size();i++)
-//    {       
-//        if(total > 10 && m_hand[i].GetValue() == 11)
-//		{
-//			total += 1;
-//		}
-//		else
-//		{
-//			total += m_hand[i].GetValue();
-//		}
-//    }
+        } 
     return total;
+}
+
+int Player::SplitTotalValue() const
+{
+    int total = 0;
+    int aceCount = 0;    
+    //cout << "checking total\n";
+    for(int i = 0;i < m_splitHand.size();i++)
+    {     
+        if(m_splitHand[i].GetValue() == 1)
+        {
+            aceCount += 1;
+        }          
+		else
+		{
+			total += m_splitHand[i].GetValue();
+		}
+    }    
+    if(aceCount == 1)
+        {
+            if(total <= 10)
+            {
+                total += 11;
+            }
+            else
+            {
+                total += 1;    
+            }
+        }
+        if(aceCount == 2)
+        {
+            if(total <= 10 && (total + 12) <= 21)
+            {
+                total += 12;
+            }
+            else
+            {
+                total += 2;    
+            }
+        }
+        if(aceCount == 3)
+        {
+            if(total <= 10 && (total + 13) <= 21)
+            {
+                total += 13;
+            }
+            else
+            {
+                total += 3;    
+            }
+        }
+        if(aceCount == 4)
+        {
+            if(total <= 10 && (total + 14) <= 21)
+            {
+                total += 14;
+            }
+            else
+            {
+                total += 4;    
+            }
+        } 
+    return total;
+}
+
+void Player::SplitHand()
+{
+    if(CanSplit())
+    {
+        Card splitCard = m_hand.back();
+        m_hand.pop_back();
+        m_splitHand.push_back(splitCard);
+        m_splitBet = m_currentBet;
+    }
+    else
+    {
+        throw invalid_argument("Error::Cards must be equal value characters to split!!\n");
+    }
 }
 
 bool Player::CanSplit()

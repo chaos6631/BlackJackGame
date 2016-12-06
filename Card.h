@@ -144,7 +144,7 @@ void Card::ShowCardShortDetails() const
 {
     string value;                    // ValueChar
     if(m_isFaceUp)
-    {
+    {       
         if (m_valueChar == 'X')
         {
             value = "10";
@@ -154,7 +154,7 @@ void Card::ShowCardShortDetails() const
             value.push_back(m_valueChar);            
         }
         cout << value;
-        OutputSuitChar(m_suitChar);                
+        OutputSuitChar(m_suitChar);   
     }
     else
     {

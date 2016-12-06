@@ -107,48 +107,27 @@ int main()
             DealCards(player1, dealer, gameDeck);
             
             // CheckNaturalBlackjack() : need to check for blackjack    
-            if(CheckNaturalBlackjack(dealer, player1, playerBet))  
-            {    // True if someone has natural BlackJack          
-                if(ContinuePlayingPrompt() == true)
-                {                    
-                    cout << "\nBegin next round......" << endl;                               // play round
-                }
-                else
-                {                    
-                    cout << "\nEnding game......" << endl;                                    // exit game
-                }
-            }
-            else // False if nobody has a natural blackjack
-            {                
-                cout << "\nBegin next round......" << endl;                                   // play round                
-            }
-            
-            //Reload the screen
-            GameScreen(player1, dealer);
-            PlayerRound(player1, dealer, gameDeck);
-            if(player1.GetTotalValue() <= 21)
-            {
-                //Dealer flips card
-                dealer.FlipInitialCard();
-                // Reload the screen
+            if(!CheckNaturalBlackjack(dealer, player1, playerBet))  // False if nobody has a natural blackjack   
+            {   
+                //Reload the screen
                 GameScreen(player1, dealer);
-                DealerRound(dealer, player1, gameDeck);
-                RoundSettlement(player1, dealer);                
-            }
-            
+                PlayerRound(player1, dealer, gameDeck);
+                if(player1.GetTotalValue() <= 21)
+                {
+                    //Dealer flips card
+                    dealer.FlipInitialCard();
+                    // Reload the screen
+                    GameScreen(player1, dealer);
+                    DealerRound(dealer, player1, gameDeck);
+                    RoundSettlement(player1, dealer);                
+                }                           
+            }      
             // Clear the hands
             player1.ClearHand();
             dealer.ClearHand();
             // Ask if user would like to play again
             wishToPlay = ContinuePlayingPrompt();
-            
-            
-            
-            //wishToPlay = false;
-            // TODO:: make dealer an extension of player class            
-           
-        }
-            
+        }            
     }
     catch(const exception& ex)
     {
@@ -227,7 +206,7 @@ void DealerRound(Dealer &gameDealer, Player &gamePlayer, Deck &gameDeck)
         {
             gameDealer.Hit(gameDeck.RemoveNextCard());
             GameScreen(gamePlayer, gameDealer);
-            Delay(1);
+            //Delay(1);
         }
         else if(gameDealer.GetTotalValue() >= 17)
         {
@@ -245,7 +224,7 @@ void PlayerRound(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
     {     // True if player is doubling down              
         gamePlayer.Hit(gameDeck.RemoveNextCard());
         GameScreen(gamePlayer, gameDealer);            // Reload screen
-        Delay(1);
+        //Delay(1);
     }
     else // False if not going to double down
     {
@@ -418,12 +397,12 @@ bool ContinuePlayingPrompt()
 void DealCards(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
 {
     cout << "Dealer will now deal cards....." << endl;
-    Delay(1);
+    //Delay(0.5);
     //cout << "test";
     for(int cardsPerPlayer = 1;cardsPerPlayer <= 2; cardsPerPlayer++)
     {
         gamePlayer.AddCard(gameDeck.RemoveNextCard());
-        Delay(0.5);
+        //Delay(0.5);
         GameScreen(gamePlayer, gameDealer);
         if(cardsPerPlayer == 1)
         {
@@ -435,7 +414,7 @@ void DealCards(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck)
         {
             gameDealer.AddCard(gameDeck.RemoveNextCard());
         }                
-        Delay(0.5);
+        //Delay(0.5);
         GameScreen(gamePlayer, gameDealer);
     }                        
 }

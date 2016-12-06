@@ -141,6 +141,15 @@ namespace GUI
         cout << "           Card Total : " << player1.GetTotalValue()
              << "\n--------------------------------------------------------------" << endl;
         
+        if(player1.SplitTotalValue() > 0)
+        {
+            cout << "--------------------------------------------------------------" << endl;
+            cout << filler << player1.GetPlayerName() << "'s Split Hand: ";
+            player1.ShowSplitCards();
+            cout << "           Card Total : " << player1.SplitTotalValue()
+                 << "\n--------------------------------------------------------------" << endl;
+        }
+        
         filler.clear();
         // If players name is longer than dealers, add space for dealer name
         if(playerNameLength > minLength)                  
