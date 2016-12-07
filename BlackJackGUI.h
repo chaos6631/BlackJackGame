@@ -62,6 +62,26 @@ namespace GUI
 	*/
     void RoundScreen(Player& player1, Dealer& dealer);
     
+    /**	YesNoChoicePrompt function
+	 *
+     * @param  string message: The prompt to be output to the user	 
+	 * @return True for Yes, False for No.
+	*/
+    bool YesNoChoicePrompt(string message);
+    
+    /**	ClearScreen function
+	 *
+     *  Clear all output from the screen.	 
+	*/
+    void ClearScreen();
+    
+    /**	GameMessage function
+	 *
+     * @param  string message: The feedback message to be output to the user	 
+	 * @return void.
+	*/
+    void GameMessage(string message);
+    
     /*************************
      FUNCTION DEFINITIONS
     **************************/
@@ -70,7 +90,7 @@ namespace GUI
     	clock_t start_time = clock();							// Start time for delay
     	clock_t end_time = seconds * 1000 + start_time;			// End time for delay is seconds * 1000 milliseconds after start time
     	while(clock() != end_time);								// Loop to simulate delay	
-    } 
+    } // END DELAY
     
     void DisplayBanner()
     {
@@ -99,12 +119,19 @@ namespace GUI
              << "=         \\ \\_____\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_____\\  \\ \\_\\ \\_\\ /\\_____\\  \\ \\_\\ \\_\\  \\ \\_____\\  \\ \\_\\ \\_\\         ="<< endl
              << "=          \\/_____/   \\/_____/   \\/_/\\/_/   \\/_____/   \\/_/\\/_/ \\/_____/   \\/_/\\/_/   \\/_____/   \\/_/\\/_/         ="<< endl
              << "===================================================================================================================" << endl; 
-    }
+    }// END BANNER
 
     void GameInfo(Player& player1)
     {
-        cout << "= Player Name: " << player1.GetPlayerName() << "          Chip Amount: $" << player1.GetPlayerMoneyTotal() << endl
-             << "====================================================================================================" << endl;
+        cout << "=" << endl
+             << "=                                  Player Name: " << player1.GetPlayerName() 
+             << "          Chip Amount: $" << player1.GetPlayerMoneyTotal() << endl
+             << "===================================================================================================================" << endl;
+    }// END INFO
+    
+    void GameMessage(string message)
+    {
+        cout << message;
     }
     
     void GameScreen(Player& player1, Dealer& dealer)
@@ -113,7 +140,7 @@ namespace GUI
         DisplayBanner();
         GameInfo(player1);
         RoundScreen(player1, dealer);
-    }
+    }// END GAMESCREEN
     
     void RoundScreen(Player& player1, Dealer& dealer)
     {
@@ -162,6 +189,42 @@ namespace GUI
            
         cout << "           Card Total : " //<< dealerTotal.str()
              << "\n--------------------------------------------------------------" << endl;
+    }// END ROUNDSCREEN
+    
+    bool YesNoChoicePrompt(string message)
+    {
+        bool answer = false;                      // True if player chooses Yes, false if No
+        bool valid = false;                       // True if user input is valid, false if not
+        char result;
+              
+        do
+        {
+            cout << message;
+            cin >> result;      
+            
+            result = toupper(result);
+            if(result == 'Y')
+            {                  
+                answer = true;
+                valid = true;
+            }
+            else if(result == 'N')
+            {                
+                valid = true;
+            }
+            else
+            {
+                cerr << "Please enter 'y/Y' for yes, 'n/N' for no" << endl;
+            }
+        }
+        while(valid == false);    
+        return answer;
+    } // END YESNO
+    
+    void ClearScreen()
+    {
+        system("CLS");                                     
     }
+    
 }
 #endif

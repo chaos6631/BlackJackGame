@@ -88,9 +88,9 @@ Deck::Deck()
     {
         this->FillDeck();
     }
-    catch(const range_error& err)
+    catch(const range_error& error)
     {
-        cerr << err.what() << endl << endl; 
+        cerr << error.what() << endl << endl; 
     }
 }
 // Copy constructor

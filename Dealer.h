@@ -29,7 +29,7 @@ class Dealer : public Player
         // STATIC DATA MEMBERS
         static const double DEFAULT_MONEY_AMOUNT;
         // DEFAULT CONSTRUCTOR
-        Dealer(): Player("Dealer1") {}
+        Dealer(): Player("Dealer") {}
         // PARAMETERIZED CONSTRUCTOR
         Dealer(string name);
         // ACCESSORS

@@ -7,13 +7,15 @@
 *				
 */
 
-#ifndef _GAMEBLACKJACK
-#define _GAMEBLACKJACK
+#ifndef _BLACKJACKGAME
+#define _BLACKJACKGAME
 
+#include "MyInputValidation.h"
+#include "BlackJackGUI.h"
 #include "Deck.h"
 #include "Player.h"
 #include "Dealer.h"
-//#include "Dealer.h"
+#include <fstream>			// needed for ifstream class
 //#include <cstdlib>					// for system()
 //#include <stdexcept>
 //#include <iomanip> 					// for output formatting
@@ -26,57 +28,514 @@
 
 
 using namespace std;
+using namespace GUI;       // Should prefix functions anyways for clarity
 
 class BlackJackGame
 {
     public:
-        static const double MINIMUM_BET;
-        
+        static const double MINIMUM_BET;        
         // default Constructor
-        BlackJackGame(){}
+        BlackJackGame(); // Should be able to define it here as well
         // Parameterized Constructor 
-		BlackJackGame(Player& player) ;
+		//BlackJackGame(Player& player) ;
+    	// ACCESSORS
     	
-		void StartGame();                   // consists of a new round
-    	void NextRound();                   // is called if player still has money and wishes to continue, consists of a new round
-    	void EndGame();                     // shows player totals and returns to the main menu
-    	//GetCurrentLeader()                // could be void just outputing the current leader or could return a player object to be used  
-    	//GetPlayerTotals()                 // Output the player money totals
+        // MUTATORS        
+        void BettingPrompt();
+        bool CheckNaturalBlackjack();
+        bool ContinuePlayingPrompt();
+        void DealCards();
+        void DealerRound();
+        void PlayerNamePrompt();
+        bool PlayerDoubleDownCheck();
+        void PlayerHitStandCheck();
+        bool PlayerSplitCheck();
+        void PlayerRound();
+        void Round();
+        void RoundSettlement();
+        void StartGame();
+        void ShuffleDeck();
+        void FillDeck();
+        void ClearHands();
+        bool LoadSavedGame();
+        void SaveGame();
+        void SaveGamePrompt();
+		// OPERATORS
 	private:
 		Player m_player;
+		Dealer m_dealer;
         Deck m_gameDeck;
-//    	Dealer m_gameDealer;
 };
 
 /*************************
  FUNCTION DEFINITIONS
 **************************/
-
-const double BlackJackGame::MINIMUM_BET = 5;
-
-BlackJackGame::BlackJackGame(Player& player)
+// Minimum bet should not be more than the default money amount 
+// for the Player class which is 100.
+const double BlackJackGame::MINIMUM_BET = 5;  
+const string SAVE_GAME_FILENAME = "saved_games.dat";
+//// Constructor
+BlackJackGame::BlackJackGame()
 {
-	m_player = player;
-//	m_gameDeck = gameDeck;
-//	m_gameDeck();
-//	m_gameDealer = gameDealer;
-//	m_gameDealer = new Dealer();
+	
 }
-//BlackJackGame::NextRound()
-//{
-//	//ask player to bet amount, which removes amount from player total
-//	// deal cards use pop_back() to remove card from vector
-//		//player.SetHand(deck.GiveCard(), deck.GiveCard())
-//		// dealer.SetHand(deck.GiveCard(), deck. GiveCard() )
-//	// display hands
-//	// Ask player to hit, stand, or split
-//	// run the dealer. Play
-//		// dealer must hit until they are over 17
-//	// decide winner and if player wins add bet amount plus appropriate winnings
-//	// end round
-//		
-//    
-//}
+
+//// Betting Prompt
+void BlackJackGame::BettingPrompt()
+{
+    double betAmount;
+    GUI::ClearScreen();                                 // Clear the screen
+    GUI::DisplayBanner();                               // Display Game Title
+    GUI::GameInfo(m_player);                            // Display Player information
+    //GUI::GameMessage("\nOk, see ya later!!\n");
+    cout << "\n(Minimum bet is $" << MINIMUM_BET << ", you may increase in $5 increments)"
+         << "\nPlace your bet: $";
+    betAmount = myValidation::GetValidDouble(MINIMUM_BET, m_player.GetPlayerMoneyTotal());
+    // need to create a validator that uses GetValidDouble and checks that the input value is an increment of 5
+    m_player.Bet(betAmount); 
+}
+
+//// Check for Natural Blackjack
+bool BlackJackGame::CheckNaturalBlackjack()
+{
+    bool isRoundOver = false;                // true if blackjack was reached by anyone, false if not
+    
+    if(m_player.GetTotalValue() == 21 && m_dealer.GetTotalValue() == 21)
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "Both you and the m_dealer have BLACKJACK!" << endl
+             << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+        m_player.CollectMoney(m_player.GetCurrentBet());
+        isRoundOver = true;
+    } 
+    else if(m_player.GetTotalValue() == 21 && m_dealer.GetTotalValue() < 21)
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "BlackJack!..... You win $" << (m_player.GetCurrentBet() * 3) << "!!!!" << endl;
+        m_player.CollectMoney(m_player.GetCurrentBet() * 3); 
+        isRoundOver = true;
+    }
+    else if(m_dealer.GetTotalValue() == 21 && m_player.GetTotalValue() < 21)
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "\nDealer has Blackjack!!...... You lose!" << endl;
+        isRoundOver = true;
+    }
+    
+    return isRoundOver;                     // Unchanged if no conditional was met
+}
+
+//// Continue Playing after a hand has been played
+bool BlackJackGame::ContinuePlayingPrompt()
+{
+    bool play = true;	
+	if(m_player.GetPlayerMoneyTotal() == 0)
+	{
+	    GUI::GameMessage("\nGAME OVER!!\n");
+	    play = false;
+    }
+    else
+    {
+        if(GUI::YesNoChoicePrompt("\nWould you like to continue playing(y/n)?"))
+        {
+            play = true;
+        }
+        else
+        {
+            GUI::ClearScreen();
+            GUI::DisplayBanner(); 
+            GUI::GameInfo(m_player);
+            SaveGamePrompt();
+            //GUI::GameMessage("\nOk, see ya later!!\n");      //NOT CREATED YET
+            cout << "\nOk, see ya later!!\n" << endl;
+            play = false;
+        }
+    }
+    return play;
+}
+
+//// Deal cards to the player and dealer
+void BlackJackGame::DealCards()
+{
+    //GUI::GameMessage("\nOk, see ya later!!\n");
+    cout << "Dealer will now deal cards....." << endl;
+    //Delay(0.5);
+    //cout << "test";
+    for(int cardsPerPlayer = 1;cardsPerPlayer <= 2; cardsPerPlayer++)
+    {
+        m_player.AddCard(m_gameDeck.RemoveNextCard());
+        //Delay(0.5);
+        GUI::GameScreen(m_player, m_dealer);
+        if(cardsPerPlayer == 1)
+        {
+            Card firstCard = m_gameDeck.RemoveNextCard();
+            firstCard.m_isFaceUp = false; 
+            m_dealer.AddCard(firstCard);
+        }
+        else
+        {
+            m_dealer.AddCard(m_gameDeck.RemoveNextCard());
+        }                
+        //Delay(0.5);
+        GameScreen(m_player, m_dealer);
+    }                        
+}
+
+//// Play Dealers hand
+void BlackJackGame::DealerRound()
+{
+    bool dealerContinue = true;
+    while(dealerContinue)
+    {
+        if(m_dealer.GetTotalValue() < 17)
+        {
+            m_dealer.Hit(m_gameDeck.RemoveNextCard());
+            GameScreen(m_player, m_dealer);
+            //Delay(1);
+        }
+        else if(m_dealer.GetTotalValue() >= 17)
+        {
+            dealerContinue = false;
+        }
+    }  
+}
+
+//// Get user input for the players name
+void BlackJackGame::PlayerNamePrompt()
+{
+    string playerName;
+    //GUI::GameMessage("\nOk, see ya later!!\n");
+    cout << "Please enter your name: ";
+    cin >> playerName;
+    m_player = Player(playerName);
+}
+
+//// Check if the player wishes to Double-Down
+bool BlackJackGame::PlayerDoubleDownCheck()
+{
+    bool doublingDown = false;                // True if player is doubling down, false if not
+    
+    if(m_player.GetTotalValue() >= 9 && m_player.GetTotalValue() <= 11)
+    {     
+        if(YesNoChoicePrompt("\nWould you like to Double-Down(y/n)? "))   
+        {
+            //string message = "You have chosen to double down with a bet of $" + m_player.GetCurrentBet() + "\n";
+            //GameMessage(message);
+            
+            m_player.DoubleDown((m_player.GetCurrentBet()));
+            //GUI::GameMessage("\nOk, see ya later!!\n");
+            cout << "You have chosen to double down with a bet of $" << m_player.GetCurrentBet() << endl;
+            doublingDown = true;
+        }        
+    }
+    return doublingDown;
+}
+
+//// Player choses to Hit or Stand
+void BlackJackGame::PlayerHitStandCheck()
+{
+    bool continueHitting = true;                          // True if player chooses to hit
+    bool valid = false;                                   // True if user input is valid, false if not
+    char result;   
+    while(continueHitting)
+    {   
+        do
+        {
+            //GameMessage("\nWould you like to HIT or STAND(H/S)? ");
+            cout << "Would you like to HIT or STAND(H/S)? ";
+            cin >> result;   
+            result = toupper(result);
+            if(result == 'H')
+            {      
+                //GameMessage("\nYou chose to HIT!\n")
+                cout << "You chose to HIT!" << endl;
+                m_player.Hit(m_gameDeck.RemoveNextCard());
+                //continueHitting = true;
+                valid = true;
+            }
+            else if(result == 'S')
+            {  
+                //GameMessage("\nYou chose to STAND!\n")
+                cout << "You chose to STAND!" << endl;    
+                continueHitting = false;             
+                valid = true;
+            }
+            else
+            {
+                //GameMessage("\nPlease enter 'H' for HIT, 'S' for STAND.\n");
+                cerr << "Please enter 'H' for HIT, 'S' for STAND." << endl;
+            }
+        }
+        while(valid == false); 
+        
+        GameScreen(m_player, m_dealer);                          // Reload the screen
+        //if value is greater than 21, inform of bust
+        if(m_player.GetTotalValue() > 21)
+        {
+            //GameMessage("\nSorry, looks like you busted!!\n");
+            cout << "\nSorry, looks like you busted!!" << endl;      // might do this outside of function
+            continueHitting = false;    
+        }   
+        else if(m_player.GetTotalValue() == 21)  
+        {
+            //GameMessage("\nLooks like you got 21!!\n");
+            cout << "\nLooks like you got 21!!" << endl;     // might do this outside of function
+            continueHitting = false;
+        }  
+    }
+}
+
+//// Check if the player can split their hand, proceed to do so if they choose
+bool BlackJackGame::PlayerSplitCheck()
+{
+    bool splitting = false;                                   // True if player is splitting, false if not
+    if(m_player.CanSplit())  
+    {           
+        if(YesNoChoicePrompt("Would you like to split your hand(y/n)? "))
+        {
+            //GameMessage("\nYou chose to split!\n");
+            // call to splithand() in player class
+            splitting = true;
+        }            
+    }
+    
+    return splitting;
+}
+
+//// Play out the players hand
+void BlackJackGame::PlayerRound()
+{
+    //// Check if player has a total of 9,10,11 then ask for DoubleDown doubling initial bet and player will receive one more card
+    //// player can also split if both cards are 5's and play it out normally.
+    if(PlayerDoubleDownCheck())                // True if player is doubling down   
+    {                
+        m_player.Hit(m_gameDeck.RemoveNextCard());
+        GameScreen(m_player, m_dealer);              // Reload screen
+        //Delay(1);
+    }
+    else                                                 // False if not going to double down
+    {
+        if(PlayerSplitCheck())
+        {      // True if going to split  
+            //GUI::GameMessage("\nOk, see ya later!!\n");                    
+            cout << "Lets start with the Left Side of your split first..." << endl;                         
+        }
+        else
+        {      // False if not going to split hand
+            GameScreen(m_player, m_dealer);            // Reload screen
+            PlayerHitStandCheck();                 
+        }
+    }
+}
+
+//// Decide the winner of the hand and distribute winnings accordingly
+void BlackJackGame::RoundSettlement()
+{
+    // Player has 21 and wins
+    if(m_player.GetTotalValue() == 21 && m_dealer.GetTotalValue() < 21)
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "You have 21!! You win $" << (m_player.GetCurrentBet() * 2) << endl;           
+        m_player.CollectMoney(m_player.GetCurrentBet() * 2);
+    }
+    // TIE of 21
+    else if(m_player.GetTotalValue() == 21 && m_dealer.GetTotalValue() == 21) 
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "Both you and the dealer have 21!" << endl
+             << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+        m_player.CollectMoney(m_player.GetCurrentBet());
+    } 
+    // TIE of same values
+    else if(m_player.GetTotalValue() < 21 && m_player.GetTotalValue() == m_dealer.GetTotalValue()) 
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "Both you and the dealer have " << m_player.GetTotalValue() << "!" << endl 
+             << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+        m_player.CollectMoney(m_player.GetCurrentBet());
+    }
+    // Player beats dealer
+    else if(m_player.GetTotalValue() <= 21 && m_player.GetTotalValue() > m_dealer.GetTotalValue())
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "You have " << m_player.GetTotalValue() << " and the dealer has " << m_dealer.GetTotalValue() << endl;
+        cout << "You beat the dealer!! You win $" << (m_player.GetCurrentBet() * 2) << endl;
+        m_player.CollectMoney(m_player.GetCurrentBet() * 2);
+    }
+    // Dealer beats player
+    else if(m_dealer.GetTotalValue() <= 21 && m_player.GetTotalValue() < m_dealer.GetTotalValue())       
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "Dealer has " << m_dealer.GetTotalValue() << ", Sorry you lost!!" << endl;
+        // continue the round
+    } 
+    // Dealer beats player
+    else if(m_dealer.GetTotalValue() <= 21 && m_player.GetTotalValue() <= 21 && m_player.GetTotalValue() < m_dealer.GetTotalValue())       
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "Dealer has " << m_dealer.GetTotalValue() << ", Sorry you lost!!" << endl;
+        // continue the round
+    }             
+    else
+    {
+        //GUI::GameMessage("\nOk, see ya later!!\n");
+        cout << "You have " << m_player.GetTotalValue() << " and the dealer has BUSTED with " << m_dealer.GetTotalValue() << ".\n";
+        cout << "You beat the dealer!! You win $" << (m_player.GetCurrentBet() * 2) << endl;
+        m_player.CollectMoney(m_player.GetCurrentBet() * 2);
+    }
+}
+
+//// Play a full round
+void BlackJackGame::Round()
+{
+    //Reload the screen
+    GameScreen(m_player, m_dealer);
+    PlayerRound();
+    if(m_player.GetTotalValue() <= 21)
+    {
+        //Dealer flips card
+        m_dealer.FlipInitialCard();
+        // Reload the screen
+        GameScreen(m_player, m_dealer);
+        DealerRound();
+        RoundSettlement();                
+    }    
+    // Replenish the game deck if card count drops below 50% 
+    if(m_gameDeck.CardsRemaining() < (m_gameDeck.MAX_CARD_COUNT / 2))
+    {
+        FillDeck();                
+    }                       
+}
+
+//// Starts game
+void BlackJackGame::StartGame()
+{
+    if(!LoadSavedGame())              // If true load saved player data, if false prompt player for name
+    {
+        PlayerNamePrompt();
+    }      
+    m_gameDeck.Shuffle();    
+    GUI::ClearScreen();                                 // Clear the screen
+    GUI::DisplayBanner();                              // Display Game Title
+    GUI::GameInfo(m_player);                           // Display Player information
+}
+
+bool BlackJackGame::LoadSavedGame()
+{
+    
+    ifstream inFile;								         // an ifstream object to connect to a file for reading
+    stringstream output;							         // the ouput string to be stored in the outFile object
+    bool loadGame = false;	
+	//if (FILE *file = fopen(SAVE_GAME_FILENAME.c_str(), "r")) 
+	inFile.open(SAVE_GAME_FILENAME.c_str());					     // Open the file to be read from 	
+		
+ 	/** If the input file could not be opened **/
+ 	if(inFile.fail()) 
+ 	{ 		 	    
+		loadGame = false;
+ 	}
+ 	/** Read from the file! **/ 
+ 	else
+    {        
+        if(GUI::YesNoChoicePrompt("\nWould you like to load your previous game(y/n)?"))
+        {
+            string name;
+            double money;
+            // Read all the contents from the file and store as new player object. 
+                  
+			while(inFile.good())
+			{			
+				inFile >> name >> money;			// Read contents and store in the variables
+				if(!inFile.fail())
+				{		 	
+				 	output << name << " " << money;					// Create output content from file contents	
+                    //cout << name << " " << money;			 	   // TESTING	   	
+				}					
+			}					
+            m_player = Player(name, money);            
+            inFile.close();
+            loadGame = true;
+        }
+        else
+        {
+            inFile.close();
+        }    
+    }  
+    
+    return loadGame;
+}
+
+void BlackJackGame::SaveGame()
+{
+    
+    ofstream outFile;								            // an ofstream object to connect to a file for writing    
+    stringstream output;							            // the ouput string to be stored in the outFile object
+	string error = "";								            // string for error message	
+    try
+    {
+        output << m_player.GetPlayerName() << " " << m_player.GetPlayerMoneyTotal();
+        //// Save current game        
+		outFile.open(SAVE_GAME_FILENAME.c_str(), fstream::in | fstream::out | fstream::trunc);	 	
+
+		/** If the file is successfully created...., otherwise throw error and end program **/
+		if(!outFile.is_open())			
+		{	
+			error = "Game NOT Saved!!";	
+			error += "\n\n\nThe file \"" + SAVE_GAME_FILENAME;	// Set the error message if unable to open the file	for writing	
+			error += "\" was NOT successfully created for writing. \nContact an IT Representative to diagnose the problem."; 
+			throw ios::failure(error);
+		}
+		else      /** File opened successfully.. **/
+		{
+		    GUI::GameMessage("Saving Game");		
+		    for(int count = 1; count <= 5; count++)				       /**************SIMULATED DELAY***************/
+			{														   // Simulated delay for 1 second for user interaction,					
+				GUI::Delay(0.1);	
+                GUI::GameMessage("..");										 		// just to slow things down a bit. Not required	    				
+			}	
+			GUI::GameMessage("Game Saved!!!");			
+			outFile << output.str();						// Write the contents of output to the file				
+		}
+    }
+    catch(ifstream::failure& error)	
+	{
+		cerr << "\n\n\nError: " << error.what() << endl;		// If there are ERRORS inform the user
+	}
+	catch(exception& error)	
+	{
+		cerr << "\n\n\nError: " << error.what() << endl;		// If there are ERRORS inform the user
+	}    
+    
+}
+
+
+void BlackJackGame::SaveGamePrompt()
+{
+    if(GUI::YesNoChoicePrompt("\nWould you like to save your game(y/n)?"))
+    {
+         SaveGame();
+    }
+}
+
+//// Shuffle the game deck
+void BlackJackGame::ShuffleDeck()
+{
+    m_gameDeck.Shuffle();
+}
+
+//// Replenish the game deck and shuffle
+void BlackJackGame::FillDeck()
+{
+    m_gameDeck.FillDeck();
+    m_gameDeck.Shuffle();
+}
+
+//// Clear the player and dealer hands
+void BlackJackGame::ClearHands()
+{
+    m_player.ClearHand();
+    m_dealer.ClearHand();    
+}
 
 #endif
 

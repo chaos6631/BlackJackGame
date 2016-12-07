@@ -44,13 +44,14 @@ double BettingPrompt(double minimumBet, double maximumBet);
 bool CheckNaturalBlackjack(Dealer &dealer, Player &player, double playerBet);
 bool ContinuePlayingPrompt();
 void DealCards(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck);
-//void ChoicePrompt(Player &gamePlayer, Deck &gameDeck);
+void PlayerNamePrompt(Player &player1);
 bool PlayerDoubleDownCheck(Player &gamePlayer);
 void PlayerHitStandCheck(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck);
 bool PlayerSplitCheck(Player &gamePlayer);
 void PlayerRound(Player &gamePlayer, Dealer &gameDealer, Deck &gameDeck);
 void DealerRound(Dealer &gameDealer, Player &gamePlayer, Deck &gameDeck);
 void RoundSettlement(Player &player1, Dealer &dealer);
+//GUI FUNCTIONS
 bool YesNoChoicePrompt(string message);
 
 /*************************
@@ -75,16 +76,11 @@ int main()
             system("CLS");   
             DisplayBanner();        
             
+            
             // Player name prompt :: SHould be added to GameBlackJack class as a method           
-            string playerName;
-            cout << "Please enter your name: ";
-            cin >> playerName;
-//            Player player1(playerName);
-//            Dealer dealer("Dealer");
-            player1 = Player(playerName);
+            PlayerNamePrompt(player1);
             dealer = Dealer("Dealer");
-            // Start game :: SHould be added to GameBlackJack class as a method
-//            Deck gameDeck; 
+            // Start game :: SHould be added to GameBlackJack class as a method 
             gameDeck = Deck(); 
             gameDeck.Shuffle();    
         }
@@ -102,6 +98,7 @@ int main()
             // Betting Prompt :: SHould be added to GameBlackJack class as a method and called in the GameBlackJack::PlayRound() method
             playerBet = BettingPrompt(MINIMUM_BET, player1.GetPlayerMoneyTotal());            
             player1.Bet(playerBet);
+            //player1.Bet(BettingPrompt(MINIMUM_BET, player1.GetPlayerMoneyTotal()));
             
             // Deal cards
             DealCards(player1, dealer, gameDeck);
@@ -146,6 +143,32 @@ int main()
 /*************************
  FUNCTION DEFINITIONS
 **************************/
+
+bool BeginGamePrompt() // Should stay in BlacJackMin.cpp
+{    
+	bool play = false;
+
+    if(GUI::YesNoChoicePrompt("\nWould you like to play a game of Blackjack(y/n)?"))
+    {
+        play = true;
+    }
+    else
+    {
+        //GameMessage("\nThat's too bad, maybe next time!! See ya.......\n");      //NOT CREATED YET
+        cout << "\nThat's too bad, maybe next time!! See ya.......\n" << endl;
+        play = false;
+    }
+    return play;
+}
+
+void PlayerNamePrompt(Player &player1)
+{
+    string playerName;
+    cout << "Please enter your name: ";
+    cin >> playerName;
+    player1 = Player(playerName);
+}
+
 void RoundSettlement(Player &player1, Dealer &dealer)
 {    
     // Player has 21 and wins
@@ -299,7 +322,7 @@ bool PlayerSplitCheck(Player &gamePlayer)
     bool splitting = false;                                   // True if player is splitting, false if not
     if(gamePlayer.CanSplit())  
     {           
-        if(YesNoChoicePrompt("Would you like to split your hand(y/n)? "))
+        if(GUI::YesNoChoicePrompt("Would you like to split your hand(y/n)? "))
         {
             //GameMessage("\nYou chose to split!\n");
             // call to splithand() in player class
@@ -308,23 +331,6 @@ bool PlayerSplitCheck(Player &gamePlayer)
     }
     
     return splitting;
-}
-
-bool BeginGamePrompt()
-{    
-	bool play = false;
-
-    if(YesNoChoicePrompt("\nWould you like to play a game of Blackjack(y/n)?"))
-    {
-        play = true;
-    }
-    else
-    {
-        //GameMessage("\nThat's too bad, maybe next time!! See ya.......\n");      //NOT CREATED YET
-        cout << "\nThat's too bad, maybe next time!! See ya.......\n" << endl;
-        play = false;
-    }
-    return play;
 }
 
 double BettingPrompt(double minimumBet, double maximumBet)
@@ -425,7 +431,7 @@ bool PlayerDoubleDownCheck(Player &gamePlayer)
     
     if(gamePlayer.GetTotalValue() >= 9 && gamePlayer.GetTotalValue() <= 11)
     {     
-        if(YesNoChoicePrompt("\nWould you like to Double-Down(y/n)? "))   
+        if(GUI::YesNoChoicePrompt("\nWould you like to Double-Down(y/n)? "))   
         {
             //string message = "You have chosen to double down with a bet of $" + gamePlayer.GetCurrentBet() + "\n";
             //GameMessage(message);
@@ -477,46 +483,4 @@ bool YesNoChoicePrompt(string message)
 	// if player still has money and or wishes to continue then
 		// then newGame.Round();
 		// else newGame.Finish();
-		
-//void ChoicePrompt(Player &gamePlayer, Deck &gameDeck)
-//{
-//    bool play = true;
-//	bool valid = false;         // for valid input
-//    char result;   
-//    
-//    cout << "What would you like to do: " << endl
-//         << "(H) Hit\n(P) Stand\n(S) Split\n(D) Double-Down)" << endl;             
-//    do
-//    {                     
-//        cout << "Choice: ";             
-//        cin >> result;        
-//        
-//        result = toupper(result);
-//        switch(result)
-//        {
-//            case 'H' : {
-//                cout << "You chose to HIT"; // run the hit method  
-//                gamePlayer.Hit(gameDeck.RemoveNextCard());                          
-//                valid = true;   
-//                break;
-//            }                        
-//            case 'P' : {
-//                cout << "You chose to STAND"; // run the stand method
-//                gamePlayer.Stand();   
-//                valid = true; 
-//                break;
-//            }                        
-//            case 'S' : {
-//                cout << "You chose to SPLIT"; // run the split method
-//                // splitting splits the cards and the initial bet amount is taken again for the split hand
-//                // then the two hands are played with the original hand played first and then the split hand
-////                gamePlayer.DoubleDown(gamePlayer.GetCurrentBet())
-//                valid = true; 
-//                break;
-//            }                       
-//                               
-//            default : cerr << "Please enter H, P, S, or D" << endl;                          
-//        }   
-//    }
-//    while(valid == false);
-//}
+
