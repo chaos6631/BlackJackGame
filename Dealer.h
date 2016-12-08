@@ -36,6 +36,7 @@ class Dealer : public Player
         
         // MUTATORS
         void FlipInitialCard();                     // Method used to flip the initial card dealt to the dealer face up
+        void Hit(Card newCard);
 };
 
 
@@ -55,4 +56,8 @@ void Dealer::FlipInitialCard()
     m_hand[0].m_isFaceUp = true;
 }
 
+void Dealer::Hit(Card newCard)
+{       
+    m_hand.push_back(newCard);       
+}
 #endif

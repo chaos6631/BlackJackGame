@@ -73,8 +73,8 @@ int main()
         while(wishToPlay)
         {   
             game.BettingPrompt();                            // Ask player how much they wish to bet            
-            game.DealCards();                                // Deal cards
-            
+            //game.DealCards();                                // Deal cards 
+            game.DealSplitHand();
             //// Check for Natural Blackjack
             if(!game.CheckNaturalBlackjack())                // False if neither player or dealer has a natural blackjack   
             {                   

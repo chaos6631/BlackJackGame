@@ -45,11 +45,12 @@ class BlackJackGame
         bool CheckNaturalBlackjack();
         bool ContinuePlayingPrompt();
         void DealCards();
+        void DealSplitHand();                        // Solely for TESTING purposes
         void DealerRound();
         void DecksToPlayWith();
         void PlayerNamePrompt();
         bool PlayerDoubleDownCheck();
-        void PlayerHitStandCheck();
+        void PlayerHitStandCheck(bool isSplitHand);
         bool PlayerSplitCheck();
         void PlayerRound();
         void Round();
@@ -158,8 +159,7 @@ bool BlackJackGame::ContinuePlayingPrompt()
 //// Deal cards to the player and dealer
 void BlackJackGame::DealCards()
 {
-    //GUI::GameMessage("\nOk, see ya later!!\n");
-    cout << "Dealer will now deal cards....." << endl;
+    //GUI::GameMessage("\nDealer will now deal cards.....\n");    
     //Delay(0.5);
     //cout << "test";
     for(int cardsPerPlayer = 1;cardsPerPlayer <= 2; cardsPerPlayer++)
@@ -180,6 +180,19 @@ void BlackJackGame::DealCards()
         //Delay(0.5);
         GameScreen(m_player, m_dealer);
     }                        
+}
+
+//// Deals a splitable hand to the player
+void BlackJackGame::DealSplitHand()
+{//int value, char valueChar , string suit, char suitChar, bool faceUp = true
+    Card card1(5, '5', "Hearts", 'H', true);
+    Card card2(5, '5', "Clubs", 'C', true);
+    Card card3(6, '6', "Hearts", 'H', true);
+    Card card4(10, 'J', "Hearts", 'H', true);
+    m_player.AddCard(card1);
+    m_player.AddCard(card2);
+    m_dealer.AddCard(card3);
+    m_dealer.AddCard(card4);
 }
 
 //// Play Dealers hand
@@ -279,54 +292,59 @@ bool BlackJackGame::PlayerDoubleDownCheck()
 }
 
 //// Player choses to Hit or Stand
-void BlackJackGame::PlayerHitStandCheck()
+void BlackJackGame::PlayerHitStandCheck(bool isSplitHand)
 {
     bool continueHitting = true;                          // True if player chooses to hit
     bool valid = false;                                   // True if user input is valid, false if not
     char result;   
+    int PlayerCardsTotal;
     while(continueHitting)
     {   
         do
         {
-            //GameMessage("\nWould you like to HIT or STAND(H/S)? ");
-            cout << "Would you like to HIT or STAND(H/S)? ";
+            GameMessage("\nWould you like to HIT or STAND(H/S)? ");            
             cin >> result;   
-            result = toupper(result);
-            if(result == 'H')
+            result = toupper(result);// Convert to uppercase
+            
+            if(result == 'H')        // Chose to hit
             {      
-                //GameMessage("\nYou chose to HIT!\n")
-                cout << "You chose to HIT!" << endl;
-                m_player.Hit(m_gameDeck.RemoveNextCard());
-                //continueHitting = true;
+                GameMessage("\nYou chose to HIT!\n");                
+                m_player.Hit(m_gameDeck.RemoveNextCard(), isSplitHand);                
                 valid = true;
             }
-            else if(result == 'S')
+            else if(result == 'S')   // Chose to stand
             {  
-                //GameMessage("\nYou chose to STAND!\n")
-                cout << "You chose to STAND!" << endl;    
+                GameMessage("\nYou chose to STAND!\n");                
                 continueHitting = false;             
                 valid = true;
             }
-            else
+            else                     // INVALID entry
             {
-                //GameMessage("\nPlease enter 'H' for HIT, 'S' for STAND.\n");
-                cerr << "Please enter 'H' for HIT, 'S' for STAND." << endl;
+                GameMessage("\nPlease enter 'H' for HIT, 'S' for STAND.\n");                
             }
         }
         while(valid == false); 
         
-        GameScreen(m_player, m_dealer);                          // Reload the screen
-        //if value is greater than 21, inform of bust
+        GameScreen(m_player, m_dealer);         // Reload the screen
+        
+        //// Set card total depending on which hand is being played
+        if(isSplitHand)
+        {
+            PlayerCardsTotal = m_player.GetSplitTotalValue();      
+        }
+        else
+        {
+            PlayerCardsTotal = m_player.GetTotalValue();    
+        }
+        //// if value is greater than 21, inform of bust
         if(m_player.GetTotalValue() > 21)
         {
-            //GameMessage("\nSorry, looks like you busted!!\n");
-            cout << "\nSorry, looks like you busted!!" << endl;      // might do this outside of function
+            GameMessage("\nSorry, looks like you busted!!\n");            
             continueHitting = false;    
         }   
         else if(m_player.GetTotalValue() == 21)  
         {
-            //GameMessage("\nLooks like you got 21!!\n");
-            cout << "\nLooks like you got 21!!" << endl;     // might do this outside of function
+            GameMessage("\nLooks like you got 21!!\n");            
             continueHitting = false;
         }  
     }
@@ -340,12 +358,11 @@ bool BlackJackGame::PlayerSplitCheck()
     {           
         if(YesNoChoicePrompt("Would you like to split your hand(y/n)? "))
         {
-            //GameMessage("\nYou chose to split!\n");
-            // call to splithand() in player class
+            GameMessage("\nYou chose to split!\n");
+            m_player.SplitHand();         // call to splithand() in player class
             splitting = true;
         }            
-    }
-    
+    }    
     return splitting;
 }
 
@@ -354,23 +371,28 @@ void BlackJackGame::PlayerRound()
 {
     //// Check if player has a total of 9,10,11 then ask for DoubleDown doubling initial bet and player will receive one more card
     //// player can also split if both cards are 5's and play it out normally.
-    if(PlayerDoubleDownCheck())                // True if player is doubling down   
+    
+    if(PlayerDoubleDownCheck())                            // True if player is doubling down   
     {                
-        m_player.Hit(m_gameDeck.RemoveNextCard());
-        GameScreen(m_player, m_dealer);              // Reload screen
+        m_player.Hit(m_gameDeck.RemoveNextCard(), false);  // False because it is not a splithand
+        GameScreen(m_player, m_dealer);                    // Reload screen
         //Delay(1);
     }
-    else                                                 // False if not going to double down
+    else                                                   // False if not going to double down
     {
         if(PlayerSplitCheck())
         {      // True if going to split  
-            //GUI::GameMessage("\nOk, see ya later!!\n");                    
-            cout << "Lets start with the Left Side of your split first..." << endl;                         
+            GameScreen(m_player, m_dealer);                // Reload screen
+            GUI::GameMessage("\nLets start with the Left Side of your split first...\n"); 
+            PlayerHitStandCheck(false);                    // False becasue it is not a splithand  
+            GameScreen(m_player, m_dealer);                // Reload screen
+            GUI::GameMessage("\nNow for the Right Side of your split!\n"); 
+            PlayerHitStandCheck(true);                     // True because it is a splithand          
         }
         else
         {      // False if not going to split hand
-            GameScreen(m_player, m_dealer);            // Reload screen
-            PlayerHitStandCheck();                 
+            GameScreen(m_player, m_dealer);                // Reload screen
+            PlayerHitStandCheck(false);                    // False becasue it is not a splithand       
         }
     }
 }

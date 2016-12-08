@@ -147,35 +147,21 @@ namespace GUI
         int minLength = dealer.GetPlayerName().length();
         int playerNameLength = player1.GetPlayerName().length();
         string filler;
-//        stringstream dealerTotal;
-//        if(dealer.IsDealersTurn() == true)
-//        {
-//            dealerTotal << dealer.GetTotalValue();
-//        }
-//        else
-//        {
-//            dealerTotal << "???";
-//        }    
+
         // If players name is shorter than dealers, add space for player name
         if(playerNameLength < minLength)
         {
             string diff1((minLength - playerNameLength), ' ');
             filler = diff1;             
         }        
+        //// Player Hand
         cout << "--------------------------------------------------------------" << endl;
-        cout << filler << player1.GetPlayerName() << "'s Hand: ";
+        cout << filler << player1.GetPlayerName() << "'s Hand -> Total("  
+             << player1.GetTotalValue() << "): ";
         player1.ShowCards();
-        cout << "           Card Total : " << player1.GetTotalValue()
-             << "\n--------------------------------------------------------------" << endl;
+        cout << endl << "--------------------------------------------------------------" << endl;
+           
         
-        if(player1.SplitTotalValue() > 0)
-        {
-            cout << "--------------------------------------------------------------" << endl;
-            cout << filler << player1.GetPlayerName() << "'s Split Hand: ";
-            player1.ShowSplitCards();
-            cout << "           Card Total : " << player1.SplitTotalValue()
-                 << "\n--------------------------------------------------------------" << endl;
-        }
         
         filler.clear();
         // If players name is longer than dealers, add space for dealer name
@@ -184,11 +170,25 @@ namespace GUI
             string diff2((playerNameLength - minLength), ' ');        
             filler = diff2;                    
         }    
-        cout << filler << dealer.GetPlayerName() << "'s Hand: ";
+        //// Split Hand
+        if(player1.GetSplitTotalValue() > 0)
+        {
+            //cout << "--------------------------------------------------------------" << endl;
+            cout << filler << "    Split Hand -> Total("
+                 << player1.GetSplitTotalValue() << "): ";
+            player1.ShowSplitCards();
+            cout << endl << "--------------------------------------------------------------" << endl;
+        }
+        //// Dealer Hand        
+        cout << filler << dealer.GetPlayerName() << "'s Hand -> Total("
+             << dealer.GetTotalValue() << "): ";
         dealer.ShowCards();     
-           
-        cout << "           Card Total : " //<< dealerTotal.str()
-             << "\n--------------------------------------------------------------" << endl;
+        cout << endl << "--------------------------------------------------------------" << endl;
+            //        cout << "--------------------------------------------------------------" << endl;
+            //        cout << filler << player1.GetPlayerName() << "'s Hand: ";
+            //        player1.ShowCards();
+            //        cout << "           Card Total : " << player1.GetTotalValue()
+            //             << "\n--------------------------------------------------------------" << endl;
     }// END ROUNDSCREEN
     
     bool YesNoChoicePrompt(string message)
