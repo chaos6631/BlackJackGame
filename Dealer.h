@@ -29,14 +29,15 @@ class Dealer : public Player
         // STATIC DATA MEMBERS
         static const double DEFAULT_MONEY_AMOUNT;
         // DEFAULT CONSTRUCTOR
-        Dealer(): Player("Dealer") {}
+        Dealer(): Player("Dealer"), m_dealersTurn(false) {}
         // PARAMETERIZED CONSTRUCTOR
         Dealer(string name);
         // ACCESSORS
         
         // MUTATORS
         void FlipInitialCard();                     // Method used to flip the initial card dealt to the dealer face up
-        void Hit(Card newCard);
+        void Hit(Card newCard);    
+        bool m_dealersTurn;
 };
 
 
@@ -54,6 +55,7 @@ Dealer::Dealer(string name)
 void Dealer::FlipInitialCard()
 {
     m_hand[0].m_isFaceUp = true;
+    m_dealersTurn = true;
 }
 
 void Dealer::Hit(Card newCard)

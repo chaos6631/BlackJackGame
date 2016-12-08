@@ -36,6 +36,7 @@ class Player
         string GetPlayerName() const { return m_playerName; };
         double GetPlayerMoneyTotal() const { return m_money; };  //OVERRIDE IN DEALER CLASS
         double GetCurrentBet() const { return m_currentBet; };
+        double GetCurrentSplitBet() const { return m_splitBet; };
         int GetTotalValue() const ;                              // Get the total value of all the cards in the hand   
         int GetSplitTotalValue() const;                             // Get the total value of all the cards in the split hand  
         bool CanSplit();                                         // True if players first two cards are same face char, false if not
@@ -54,8 +55,10 @@ class Player
     private:      
     	double m_money;            // Total funds available
         double m_currentBet;	   // Current bet amount for the round
-    	vector<Card> m_splitHand;  // NOT REQUIRED BUT IS OPTION    	
-        double m_splitBet;         // the amount of original bet 	
+    	vector<Card> m_splitHand;  // Vector containing card objects that make up a split hand    	
+        double m_splitBet;         // The amount of original bet, used for clarity, could have 
+                                   //  just referenced m_currentBet as a split uses same amount 
+                                   //  as original bet. 
 };
 
 
@@ -239,6 +242,7 @@ void Player::SplitHand()
         m_hand.pop_back();
         m_splitHand.push_back(splitCard);
         m_splitBet = m_currentBet;
+        Bet(m_splitBet);
     }
     else
     {

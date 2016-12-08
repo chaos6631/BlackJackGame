@@ -82,6 +82,37 @@ namespace GUI
 	*/
     void GameMessage(string message);
     
+    /**	PauseGame function
+	 *
+     * Pauses game and waits for user to press any key to proceed 
+	 * @return void.
+	*/
+    void PauseGame();
+    
+    /**	SetConsoleColour function
+	 *  (code snippet taken from http://stackoverflow.com/questions/25559077/how-to-get-background-color-back-to-previous-color-after-use-of-std-handle)
+	 *  Sets the colour of the text in the console window 
+	 *
+     * @param  Attributes: attributes taken from Console Screen Buffer	 
+     * @param  Colour: console colour to be set
+	 * @return void.
+	*/
+    void SetConsoleColour(DWORD Colour);
+
+    /**	ResetConsoleColour function
+	 *  (code snippet taken from http://stackoverflow.com/questions/25559077/how-to-get-background-color-back-to-previous-color-after-use-of-std-handle)
+	 *  Resets the colour of the text in the console window to default
+	 *  
+     * @param  Attributes: attributes taken from Console Screen Buffer 
+	 * @return void.
+	*/
+    void ResetConsoleColour();
+    
+    /*************************
+     GLOBALS
+    **************************/
+    static WORD Attributes = 0;
+    
     /*************************
      FUNCTION DEFINITIONS
     **************************/
@@ -94,6 +125,7 @@ namespace GUI
     
     void DisplayBanner()
     {
+        
     //    cout << "====================================================================================================" << endl
     //         << "=       _/_/_/    _/          _/_/      _/_/_/  _/    _/        _/    _/_/      _/_/_/  _/    _/   =" << endl
     //         << "=      _/    _/  _/        _/    _/  _/        _/  _/          _/  _/    _/  _/        _/  _/      =" << endl
@@ -112,26 +144,27 @@ namespace GUI
 //             << "=        ######  ####### ##   ###  #####  ###  ##   ####  ##   ###  #####  ###  ##                 =" << endl
 //             << "=                         ###                  ##          ###                  ##                 =" << endl
 //             << "====================================================================================================" << endl;
-        cout << "===================================================================================================================" << endl
-             << "=         ______     __         ______     ______     __  __       __     ______     ______     __  __            =" << endl
+        cout << "===================================================================================================================" << endl;
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_BLUE);  
+        cout << "=         ______     __         ______     ______     __  __       __     ______     ______     __  __            =" << endl
              << "=        /\\  == \\   /\\ \\       /\\  __ \\   /\\  ___\\   /\\ \\/ /      /\\ \\   /\\  __ \\   /\\  ___\\   /\\ \\/ /            ="<< endl
              << "=        \\ \\  __<   \\ \\ \\____  \\ \\  __ \\  \\ \\ \\____  \\ \\  _-.    _\\_\\ \\  \\ \\  __ \\  \\ \\ \\____  \\ \\  _-.           =" << endl
              << "=         \\ \\_____\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_____\\  \\ \\_\\ \\_\\ /\\_____\\  \\ \\_\\ \\_\\  \\ \\_____\\  \\ \\_\\ \\_\\         ="<< endl
-             << "=          \\/_____/   \\/_____/   \\/_/\\/_/   \\/_____/   \\/_/\\/_/ \\/_____/   \\/_/\\/_/   \\/_____/   \\/_/\\/_/         ="<< endl
-             << "===================================================================================================================" << endl; 
-    }// END BANNER
+             << "=          \\/_____/   \\/_____/   \\/_/\\/_/   \\/_____/   \\/_/\\/_/ \\/_____/   \\/_/\\/_/   \\/_____/   \\/_/\\/_/         ="<< endl;
+        GUI::ResetConsoleColour();  
+        cout << "===================================================================================================================" << endl; 
+    } //// END BANNER
 
     void GameInfo(Player& player1)
-    {
-        cout << "=" << endl
-             << "=                                  Player Name: " << player1.GetPlayerName() 
-             << "          Chip Amount: $" << player1.GetPlayerMoneyTotal() << endl
+    {         
+        cout << "                                   Player Name: " << player1.GetPlayerName() 
+             << "          Chip Amount: $" << player1.GetPlayerMoneyTotal() << endl 
              << "===================================================================================================================" << endl;
     }// END INFO
     
     void GameMessage(string message)
     {
-        cout << message;
+        cout << message;           
     }
     
     void GameScreen(Player& player1, Dealer& dealer)
@@ -155,13 +188,12 @@ namespace GUI
             filler = diff1;             
         }        
         //// Player Hand
-        cout << "--------------------------------------------------------------" << endl;
+        cout << "\n---------------------------------------------------------" << endl;        
         cout << filler << player1.GetPlayerName() << "'s Hand -> Total("  
              << player1.GetTotalValue() << "): ";
         player1.ShowCards();
-        cout << endl << "--------------------------------------------------------------" << endl;
-           
-        
+        cout << endl << "---------------------------------------------------------" << endl; 
+                
         
         filler.clear();
         // If players name is longer than dealers, add space for dealer name
@@ -172,23 +204,25 @@ namespace GUI
         }    
         //// Split Hand
         if(player1.GetSplitTotalValue() > 0)
-        {
-            //cout << "--------------------------------------------------------------" << endl;
-            cout << filler << "    Split Hand -> Total("
+        {            
+            cout << filler << "   Split Hand -> Total("
                  << player1.GetSplitTotalValue() << "): ";
             player1.ShowSplitCards();
-            cout << endl << "--------------------------------------------------------------" << endl;
+            cout << endl << "---------------------------------------------------------" << endl;
         }
-        //// Dealer Hand        
-        cout << filler << dealer.GetPlayerName() << "'s Hand -> Total("
-             << dealer.GetTotalValue() << "): ";
+        //// Dealer Hand  
+        cout << filler << dealer.GetPlayerName() << "'s Hand -> Total(";
+        if(dealer.m_dealersTurn)
+        {
+            cout << dealer.GetTotalValue();   
+        }
+        else
+        {
+            cout << "??";
+        }        
+        cout << "): ";
         dealer.ShowCards();     
-        cout << endl << "--------------------------------------------------------------" << endl;
-            //        cout << "--------------------------------------------------------------" << endl;
-            //        cout << filler << player1.GetPlayerName() << "'s Hand: ";
-            //        player1.ShowCards();
-            //        cout << "           Card Total : " << player1.GetTotalValue()
-            //             << "\n--------------------------------------------------------------" << endl;
+        cout << endl << "---------------------------------------------------------" << endl;            
     }// END ROUNDSCREEN
     
     bool YesNoChoicePrompt(string message)
@@ -226,5 +260,26 @@ namespace GUI
         system("CLS");                                     
     }
     
+    void PauseGame()
+    {
+        system("pause");
+    }
+
+    void SetConsoleColour(DWORD Colour)
+    {
+        CONSOLE_SCREEN_BUFFER_INFO Info;
+        HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+        GetConsoleScreenBufferInfo(hStdout, &Info);
+        Attributes = Info.wAttributes;
+        SetConsoleTextAttribute(hStdout, Colour);
+    }
+    
+    void ResetConsoleColour()
+    {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), Attributes);
+    }
+
+
+
 }
 #endif

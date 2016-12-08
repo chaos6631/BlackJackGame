@@ -44,47 +44,48 @@ bool BeginGamePrompt();
 /*************************
  GLOBALS
 **************************/
-//const double MINIMUM_BET = 5;
-//Player player1;
-//Dealer dealer;
-//Deck gameDeck;
 BlackJackGame game;
+
+/*************************
+ MAIN 
+**************************/
 int main()
 {
 	bool wishToPlay = true;
 	
     srand(time(0));                        // Needed for random_shuffle to work should only be implemented once, so in blackjack.cpp main
     SetConsoleOutputCP(65001);             // Code Page must be set to this for Unicode characters to work properly
-    GUI::DisplayBanner();
+    
+    GUI::DisplayBanner();                  // Displays Game LOGO
+    
     try
     {
         wishToPlay = BeginGamePrompt();                      // True if player wants to play, false if not
         if(wishToPlay)
-        {      
+        {    
             GUI::ClearScreen();
             GUI::DisplayBanner(); 
             //// Start the Game if player wishToPlay is true
             game.StartGame();           
         }
-        
-        cout << "Cards Left: " << game.GetCardCount();
-        cin.get();
+                
         //// Continue playing rounds as long as player wants to continue
         while(wishToPlay)
         {   
-            game.BettingPrompt();                            // Ask player how much they wish to bet            
-            //game.DealCards();                                // Deal cards 
-            game.DealSplitHand();
+            //// Prompt for Bet, then deal cards
+            game.BettingPrompt();                              // Ask player how much they wish to bet            
+            game.DealCards();                                  // Deal cards (comment out to test for SPLIT)
+            //game.DealSplitHand();                            // TESTING FOR SPLITHAND FUNCTIONALITY
+            
             //// Check for Natural Blackjack
-            if(!game.CheckNaturalBlackjack())                // False if neither player or dealer has a natural blackjack   
+            if(!game.CheckNaturalBlackjack())                  // False if neither player or dealer has a natural blackjack   
             {                   
-                game.Round();                                // Play Round                                      
+                game.Round();                                  // Play Round                                      
             }                  
             //// Round Over
-            game.ClearHands();                               // Clear the hands
-            
-            wishToPlay = game.ContinuePlayingPrompt();       // Ask if user would like to play again
-        }//// End of wishToPlay loop           
+            game.ClearHands();                                 // Clear the hands            
+            wishToPlay = game.ContinuePlayingPrompt();         // Ask if user would like to play again
+        }         
     }
     catch(const invalid_argument& error) 
     {
@@ -119,8 +120,7 @@ bool BeginGamePrompt() // Should stay in BlackJackMain.cpp
     }
     else
     {
-        //GameMessage("\nThat's too bad, maybe next time!! See ya.......\n");      //NOT CREATED YET
-        cout << "\nThat's too bad, maybe next time!! See ya.......\n" << endl;
+        GUI::GameMessage("\nThat's too bad, maybe next time!! See ya.......\n");      //NOT CREATED YET        
         play = false;
     }
     return play;

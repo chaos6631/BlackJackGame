@@ -33,7 +33,8 @@ using namespace GUI;       // Should prefix functions anyways for clarity
 class BlackJackGame
 {
     public:
-        static const double MINIMUM_BET;        
+        static const double MINIMUM_BET; 
+        static const int MAXIMUM_SCORE;          
         // default Constructor
         BlackJackGame(); // Should be able to define it here as well
         // Parameterized Constructor 
@@ -54,7 +55,7 @@ class BlackJackGame
         bool PlayerSplitCheck();
         void PlayerRound();
         void Round();
-        void RoundSettlement();
+        void RoundSettlement(bool isSplitHand);
         void StartGame();
         void ShuffleDeck();
         void FillDeck();
@@ -74,8 +75,9 @@ class BlackJackGame
 **************************/
 //// Minimum bet should not be more than the default money amount for the Player class which is 100.
 const double BlackJackGame::MINIMUM_BET = 5;  
+const int BlackJackGame::MAXIMUM_SCORE = 21;       
 const string SAVE_GAME_FILENAME = "saved_games.dat"; // File that stores the saved game
-
+  
 //// Constructor
 BlackJackGame::BlackJackGame()
 {
@@ -86,12 +88,14 @@ BlackJackGame::BlackJackGame()
 void BlackJackGame::BettingPrompt()
 {
     double betAmount;
+    stringstream infoMessage;
     GUI::ClearScreen();                                 // Clear the screen
     GUI::DisplayBanner();                               // Display Game Title
     GUI::GameInfo(m_player);                            // Display Player information
-    //GUI::GameMessage("\nOk, see ya later!!\n");
-    cout << "\n(Minimum bet is $" << MINIMUM_BET << ", you may increase in $5 increments)"
-         << "\nPlace your bet: $";
+    infoMessage << "\n(Minimum bet is $" << MINIMUM_BET << ", you may increase in $5 increments)" << "\nPlace your bet: $";
+    GUI::GameMessage(infoMessage.str());
+    //cout << "\n(Minimum bet is $" << MINIMUM_BET << ", you may increase in $5 increments)"
+    //    << "\nPlace your bet: $";
     betAmount = myValidation::GetValidDouble(MINIMUM_BET, m_player.GetPlayerMoneyTotal());
     // need to create a validator that uses GetValidDouble and checks that the input value is an increment of 5
     m_player.Bet(betAmount); 
@@ -101,26 +105,27 @@ void BlackJackGame::BettingPrompt()
 bool BlackJackGame::CheckNaturalBlackjack()
 {
     bool isRoundOver = false;                // true if blackjack was reached by anyone, false if not
+    stringstream infoMessage;
     
     if(m_player.GetTotalValue() == 21 && m_dealer.GetTotalValue() == 21)
-    {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "Both you and the m_dealer have BLACKJACK!" << endl
-             << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+    {        
+        infoMessage << "Both you and the m_dealer have BLACKJACK!" << endl
+                    << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+        GUI::GameMessage(infoMessage.str());
         m_player.CollectMoney(m_player.GetCurrentBet());
         isRoundOver = true;
     } 
     else if(m_player.GetTotalValue() == 21 && m_dealer.GetTotalValue() < 21)
     {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "BlackJack!..... You win $" << (m_player.GetCurrentBet() * 3) << "!!!!" << endl;
+        infoMessage << "BlackJack!..... You win $" << (m_player.GetCurrentBet() * 3) << "!!!!" << endl;
+        GUI::GameMessage(infoMessage.str());
         m_player.CollectMoney(m_player.GetCurrentBet() * 3); 
         isRoundOver = true;
     }
     else if(m_dealer.GetTotalValue() == 21 && m_player.GetTotalValue() < 21)
-    {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "\nDealer has Blackjack!!...... You lose!" << endl;
+    {        
+        infoMessage << "\nDealer has Blackjack!!...... You lose!" << endl;
+        GUI::GameMessage(infoMessage.str());
         isRoundOver = true;
     }
     
@@ -158,10 +163,8 @@ bool BlackJackGame::ContinuePlayingPrompt()
 
 //// Deal cards to the player and dealer
 void BlackJackGame::DealCards()
-{
-    //GUI::GameMessage("\nDealer will now deal cards.....\n");    
-    //Delay(0.5);
-    //cout << "test";
+{    
+    //Delay(0.5);    
     for(int cardsPerPlayer = 1;cardsPerPlayer <= 2; cardsPerPlayer++)
     {
         m_player.AddCard(m_gameDeck.RemoveNextCard());
@@ -184,7 +187,7 @@ void BlackJackGame::DealCards()
 
 //// Deals a splitable hand to the player
 void BlackJackGame::DealSplitHand()
-{//int value, char valueChar , string suit, char suitChar, bool faceUp = true
+{   //int value, char valueChar , string suit, char suitChar, bool faceUp = true
     Card card1(5, '5', "Hearts", 'H', true);
     Card card2(5, '5', "Clubs", 'C', true);
     Card card3(6, '6', "Hearts", 'H', true);
@@ -263,8 +266,7 @@ void BlackJackGame::DecksToPlayWith()
 void BlackJackGame::PlayerNamePrompt()
 {
     string playerName;
-    //GUI::GameMessage("\nOk, see ya later!!\n");
-    cout << "Please enter your name: ";
+    GUI::GameMessage("\nPlease enter your name: ");    
     cin >> playerName;
     myValidation::ClearInputBuffer();
     m_player = Player(playerName);
@@ -274,17 +276,15 @@ void BlackJackGame::PlayerNamePrompt()
 bool BlackJackGame::PlayerDoubleDownCheck()
 {
     bool doublingDown = false;                // True if player is doubling down, false if not
+    stringstream infoMessage;
     
     if(m_player.GetTotalValue() >= 9 && m_player.GetTotalValue() <= 11)
     {     
         if(YesNoChoicePrompt("\nWould you like to Double-Down(y/n)? "))   
-        {
-            //string message = "You have chosen to double down with a bet of $" + m_player.GetCurrentBet() + "\n";
-            //GameMessage(message);
-            
+        {      
             m_player.DoubleDown((m_player.GetCurrentBet()));
-            //GUI::GameMessage("\nOk, see ya later!!\n");
-            cout << "You have chosen to double down with a bet of $" << m_player.GetCurrentBet() << endl;
+            infoMessage << "You have chosen to double down with a bet of $" << m_player.GetCurrentBet() << endl;
+            GUI::GameMessage(infoMessage.str());
             doublingDown = true;
         }        
     }
@@ -297,7 +297,7 @@ void BlackJackGame::PlayerHitStandCheck(bool isSplitHand)
     bool continueHitting = true;                          // True if player chooses to hit
     bool valid = false;                                   // True if user input is valid, false if not
     char result;   
-    int PlayerCardsTotal;
+    int playerCardsTotal;
     while(continueHitting)
     {   
         do
@@ -330,21 +330,20 @@ void BlackJackGame::PlayerHitStandCheck(bool isSplitHand)
         //// Set card total depending on which hand is being played
         if(isSplitHand)
         {
-            PlayerCardsTotal = m_player.GetSplitTotalValue();      
+            playerCardsTotal = m_player.GetSplitTotalValue();      
         }
         else
         {
-            PlayerCardsTotal = m_player.GetTotalValue();    
+            playerCardsTotal = m_player.GetTotalValue();    
         }
         //// if value is greater than 21, inform of bust
-        if(m_player.GetTotalValue() > 21)
-        {
-            GameMessage("\nSorry, looks like you busted!!\n");            
+        if(playerCardsTotal > 21)
+        {                       
             continueHitting = false;    
         }   
-        else if(m_player.GetTotalValue() == 21)  
+        else if(playerCardsTotal == 21)  
         {
-            GameMessage("\nLooks like you got 21!!\n");            
+            //GameMessage("\nLooks like you got 21!!\n");            
             continueHitting = false;
         }  
     }
@@ -398,59 +397,68 @@ void BlackJackGame::PlayerRound()
 }
 
 //// Decide the winner of the hand and distribute winnings accordingly
-void BlackJackGame::RoundSettlement()
+void BlackJackGame::RoundSettlement(bool isSplitHand)
 {
-    // Player has 21 and wins
-    if(m_player.GetTotalValue() == 21 && m_dealer.GetTotalValue() < 21)
+    int playerTotal = m_player.GetTotalValue();
+    double playerBet = m_player.GetCurrentBet();
+    stringstream infoMessage;
+    if(isSplitHand)
     {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "You have 21!! You win $" << (m_player.GetCurrentBet() * 2) << endl;           
-        m_player.CollectMoney(m_player.GetCurrentBet() * 2);
+        playerTotal = m_player.GetSplitTotalValue();
+        playerBet = m_player.GetCurrentSplitBet();
     }
-    // TIE of 21
-    else if(m_player.GetTotalValue() == 21 && m_dealer.GetTotalValue() == 21) 
+    
+    if(playerTotal <= MAXIMUM_SCORE)
     {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "Both you and the dealer have 21!" << endl
-             << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
-        m_player.CollectMoney(m_player.GetCurrentBet());
-    } 
-    // TIE of same values
-    else if(m_player.GetTotalValue() < 21 && m_player.GetTotalValue() == m_dealer.GetTotalValue()) 
-    {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "Both you and the dealer have " << m_player.GetTotalValue() << "!" << endl 
-             << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
-        m_player.CollectMoney(m_player.GetCurrentBet());
+       // Player has 21 and wins
+        if(playerTotal == MAXIMUM_SCORE && m_dealer.GetTotalValue() < MAXIMUM_SCORE)
+        {
+            infoMessage << "You have 21!! You win $" << (playerBet * 2) << endl;           
+            GUI::GameMessage(infoMessage.str());
+            m_player.CollectMoney(playerBet * 2);
+        }
+        // TIE of 21
+        else if(playerTotal == MAXIMUM_SCORE && m_dealer.GetTotalValue() == MAXIMUM_SCORE) 
+        {
+            infoMessage << "Both you and the dealer have 21!" << endl
+                        << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+            GUI::GameMessage(infoMessage.str());
+            m_player.CollectMoney(playerBet);
+        } 
+        // TIE of same values
+        else if(playerTotal < MAXIMUM_SCORE && playerTotal == m_dealer.GetTotalValue()) 
+        {
+            infoMessage << "Both you and the dealer have " << playerTotal << "!" << endl 
+                        << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+            GUI::GameMessage(infoMessage.str());
+            m_player.CollectMoney(playerBet);
+        }
+        // Player beats dealer
+        else if(playerTotal <= MAXIMUM_SCORE && playerTotal > m_dealer.GetTotalValue())
+        {
+            infoMessage << "You have " << playerTotal << " and the dealer has " << m_dealer.GetTotalValue() << endl
+                        << "You beat the dealer!! You win $" << (playerBet * 2) << endl;
+            GUI::GameMessage(infoMessage.str());
+            m_player.CollectMoney(playerBet * 2);
+        }
+        // Dealer beats player
+        else if(m_dealer.GetTotalValue() <= MAXIMUM_SCORE && playerTotal < m_dealer.GetTotalValue())       
+        {
+            infoMessage << "Dealer has " << m_dealer.GetTotalValue() << ", Sorry you lost!!" << endl;
+            GUI::GameMessage(infoMessage.str());
+            // continue the round
+        }               
+        else
+        {
+            infoMessage << "You have " << playerTotal << " and the dealer has BUSTED with " << m_dealer.GetTotalValue() << "." << endl
+                        << "You beat the dealer!! You win $" << (playerBet * 2) << endl;
+            GUI::GameMessage(infoMessage.str());
+            m_player.CollectMoney(playerBet * 2);
+        }
     }
-    // Player beats dealer
-    else if(m_player.GetTotalValue() <= 21 && m_player.GetTotalValue() > m_dealer.GetTotalValue())
-    {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "You have " << m_player.GetTotalValue() << " and the dealer has " << m_dealer.GetTotalValue() << endl;
-        cout << "You beat the dealer!! You win $" << (m_player.GetCurrentBet() * 2) << endl;
-        m_player.CollectMoney(m_player.GetCurrentBet() * 2);
-    }
-    // Dealer beats player
-    else if(m_dealer.GetTotalValue() <= 21 && m_player.GetTotalValue() < m_dealer.GetTotalValue())       
-    {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "Dealer has " << m_dealer.GetTotalValue() << ", Sorry you lost!!" << endl;
-        // continue the round
-    } 
-    // Dealer beats player
-    else if(m_dealer.GetTotalValue() <= 21 && m_player.GetTotalValue() <= 21 && m_player.GetTotalValue() < m_dealer.GetTotalValue())       
-    {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "Dealer has " << m_dealer.GetTotalValue() << ", Sorry you lost!!" << endl;
-        // continue the round
-    }             
     else
     {
-        //GUI::GameMessage("\nOk, see ya later!!\n");
-        cout << "You have " << m_player.GetTotalValue() << " and the dealer has BUSTED with " << m_dealer.GetTotalValue() << ".\n";
-        cout << "You beat the dealer!! You win $" << (m_player.GetCurrentBet() * 2) << endl;
-        m_player.CollectMoney(m_player.GetCurrentBet() * 2);
+        GUI::GameMessage("Sorry, Looks like you BUSTED!!!\n");
     }
 }
 
@@ -460,15 +468,63 @@ void BlackJackGame::Round()
     //Reload the screen
     GameScreen(m_player, m_dealer);
     PlayerRound();
-    if(m_player.GetTotalValue() <= 21)
+    //// Player has not busted and doesn't have a split hand
+    if(m_player.GetTotalValue() <= 21 || m_player.GetCurrentSplitBet() == 0)
     {
         //Dealer flips card
         m_dealer.FlipInitialCard();
         // Reload the screen
         GameScreen(m_player, m_dealer);
-        DealerRound();
-        RoundSettlement();                
-    }    
+        DealerRound();        
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);           
+        GUI::GameMessage("\n            RESULTS");
+        GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n"); 
+        GUI::ResetConsoleColour();     
+        RoundSettlement(false);    
+    }
+    //// Player has busted and doesn't have a split  
+    else if(m_player.GetTotalValue() > 21 || m_player.GetCurrentSplitBet() == 0)
+    {
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);           
+        GUI::GameMessage("\n            RESULTS");
+        GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n"); 
+        GUI::ResetConsoleColour();     
+        RoundSettlement(false);  
+    }
+    //// Player has not busted and has a split
+    else if(m_player.GetTotalValue() <= 21 || m_player.GetSplitTotalValue() <= 21)
+    {
+        //Dealer flips card
+        m_dealer.FlipInitialCard();
+        // Reload the screen
+        GameScreen(m_player, m_dealer);
+        DealerRound();  
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);      
+        GUI::GameMessage("\n      LEFT SIDE RESULTS");
+        GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n");
+        GUI::ResetConsoleColour();  
+        RoundSettlement(false);   
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);           
+        GUI::GameMessage("\n      RIGHT SIDE RESULTS");
+        GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n"); 
+        GUI::ResetConsoleColour();     
+        RoundSettlement(true);         
+    }  
+    //// Player has split and has busted with both hands
+    else if(m_player.GetTotalValue() > 21 && m_player.GetSplitTotalValue() > 21)
+    {
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);      
+        GUI::GameMessage("\n      LEFT SIDE RESULTS");
+        GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n");
+        GUI::ResetConsoleColour(); 
+        RoundSettlement(false);   
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);           
+        GUI::GameMessage("\n      RIGHT SIDE RESULTS");
+        GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n"); 
+        GUI::ResetConsoleColour();               
+        RoundSettlement(true); 
+    }
+    
     // Replenish the game deck if card count drops below 50% 
     if(m_gameDeck.CardsRemaining() < (m_gameDeck.GetMaxCardCount() / 2))
     {
@@ -604,7 +660,8 @@ void BlackJackGame::FillDeck()
 void BlackJackGame::ClearHands()
 {
     m_player.ClearHand();
-    m_dealer.ClearHand();    
+    m_dealer.ClearHand(); 
+    m_dealer.m_dealersTurn = false;   
 }
 
 int BlackJackGame::GetCardCount() const
