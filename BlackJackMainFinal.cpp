@@ -67,6 +67,8 @@ int main()
             game.StartGame();           
         }
         
+        cout << "Cards Left: " << game.GetCardCount();
+        cin.get();
         //// Continue playing rounds as long as player wants to continue
         while(wishToPlay)
         {   

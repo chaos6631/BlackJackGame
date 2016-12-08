@@ -1,0 +1,1 @@
+- If more time was available a class for CardShoe would have been created which was an extension of the Deck Class

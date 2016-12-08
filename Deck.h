@@ -35,7 +35,7 @@ class Deck {
 		
 	public:	   
         // Stacic Data Members
-	    static const int MAX_CARD_COUNT; 	      // Total number of cards in deck
+	    //static const int MAX_CARD_COUNT; 	      // Total number of cards in deck
         static const int MIN_VALUE_INDEX;         // Minimum index for VALUES and VALUE_CHAR vectors
 		static const int MAX_VALUE_INDEX;         // Maximum index for VALUES and VALUE_CHAR vectors
 	    static const int MIN_SUIT_INDEX;          // Minimum index for SUITS and SUIT_CHARS vectors
@@ -52,24 +52,32 @@ class Deck {
 	    Deck& operator=(const Deck &source);        // Assignment operator
 	    
 	    // MUTATORS
-		void FillDeck();        // calls method from Deck
-		void Shuffle();         // calls method from Deck
-		Card RemoveNextCard();      // Remove the top card from the deck
+		void FillDeck();                            // Fills the deck with playing cards.
+		void SetDeckTotal(int numOfDecks = 1);      // Sets m_maximumCardCount to the appropriate amount based on deck count,
+                                                    //   the default cards per deck is 52.
+        void CalculateCardsPerDeck();               // Calculates cards per deck based on the size of VALUE_CHAR vector multiplied
+                                                    //   by the size of the SUITS vector.
+		void Shuffle();                             // Shuffles all cards remaining.
+		Card RemoveNextCard();                      // Remove the top card from the deck.
 
 		// ACCESSORS
-		void DisplayRemainingCards() const;
-		//void OutputSuitChar(char suit) const;
-		int CardsRemaining() const { return m_cards.size(); };                //Returns the number of cards left in the deck  
+		void DisplayRemainingCards() const;                           // Displays all the cards remaining in the deck object
+		int GetDeckCount() const { return m_numberOfDecks; };         // Returns the number of decks that user has chosen to play with
+		int GetMaxCardCount() const { return m_maximumCardCount; };   // Returns the maximum card count for the deck object
+		int CardsRemaining() const { return m_cards.size(); };        // Returns the number of cards left in the deck object
 	private:
 	    // MEMBERS
-		vector<Card> m_cards;
+		vector<Card> m_cards;               // A vector of card objects reperesenting individual or multiple decks of cards figuritively.
+		int m_numberOfDecks;                // The number of decks to be played with, default is 1.                  
+        int m_cardsPerDeck;                 // The number of cards per deck.
+		int m_maximumCardCount;             // The maximum number of cards for the Deck object.
 };
 
 /********************* 
 Deck Class Definitions
  *********************/ 
 //const string StandardPlayingCard::SUITS[] = { "Spades", "Hearts", "Diamonds", "Clubs" };
-const int Deck::MAX_CARD_COUNT = 52;
+//const int Deck::MAX_CARD_COUNT = 52;
 const int Deck::MIN_VALUE_INDEX = 0;     // Minimum index for VALUES and VALUE_CHAR vectors
 const int Deck::MAX_VALUE_INDEX = 12;    // Maximum index for VALUES and VALUE_CHAR vectors
 const int Deck::MIN_SUIT_INDEX = 0;      // Minimum index for SUITS and SUIT_CHARS vectors
@@ -84,8 +92,10 @@ const vector<char> Deck::VALUE_CHAR = {'2','3','4','5','6','7','8','9','X','J','
 // Default constructor
 Deck::Deck()
 {    
+    m_numberOfDecks = 1;
     try
     {
+        this->CalculateCardsPerDeck();
         this->FillDeck();
     }
     catch(const range_error& error)
@@ -104,38 +114,38 @@ Deck& Deck::operator=(const Deck &source)
 	m_cards = source.m_cards;	
 	return *this;
 } 
-// FillDeck()
+//// FillDeck()
 void Deck::FillDeck() // **PARAM int DeckCount to be added
 {	    
 	int value = 0;				// Temp to hold card point value
-	char valueChar;  		// Temp to hold card value character
+	char valueChar;  		    // Temp to hold card value character
 	string suit = "";			// Temp to hold card suit as a string
-	char suitChar;  		// Temp to hold card suit as a glyph
+	char suitChar;  		    // Temp to hold card suit as a glyph
 	
-//	for(int i = 1; i <= deckCount; i++)
-//	{
-//	    
-//    }
 	//Check if there are any cards left in the deck, if so remove them
 	if(m_cards.size() > 0)
 	{
 	    m_cards.clear();
     }
-    //Set suit attributes
-	for(int suitIndex = MIN_SUIT_INDEX; suitIndex <= MAX_SUIT_INDEX; suitIndex++) 
-    {
-		suit = SUITS[suitIndex];
-		suitChar = SUIT_CHARS[suitIndex];
-		// Set value attributes
-		for(int valueIndex = MIN_VALUE_INDEX; valueIndex <= MAX_VALUE_INDEX; valueIndex++) 
-        {
-			value = VALUES[valueIndex];
-			valueChar = VALUE_CHAR[valueIndex];
-			Card newCard(value, valueChar, suit, suitChar);	// Create newcard
-	        m_cards.push_back(newCard);						// Add card to deck	        
-		}
-	}	
     
+    // For each figuritive deck, fill the Deck object with cards
+    for(int currentDeck = 1; currentDeck <= m_numberOfDecks; currentDeck++)
+    {
+        //Set suit attributes
+    	for(int suitIndex = MIN_SUIT_INDEX; suitIndex <= MAX_SUIT_INDEX; suitIndex++) 
+        {
+    		suit = SUITS[suitIndex];
+    		suitChar = SUIT_CHARS[suitIndex];
+    		// Set value attributes
+    		for(int valueIndex = MIN_VALUE_INDEX; valueIndex <= MAX_VALUE_INDEX; valueIndex++) 
+            {
+    			value = VALUES[valueIndex];
+    			valueChar = VALUE_CHAR[valueIndex];
+    			Card newCard(value, valueChar, suit, suitChar);	// Create newcard
+    	        m_cards.push_back(newCard);						// Add card to deck	        
+    		}
+    	}
+    }        
 //    if(m_cards.size() > MAX_CARD_COUNT)
 //    {
 //        m_cards.clear();                    // Clear the vector of all elements
@@ -148,7 +158,8 @@ void Deck::FillDeck() // **PARAM int DeckCount to be added
 //        throw range_error(strOut.str());    // throw a range_error exception initialized with the error string        
 //    }
 }
-// DisplayRemainingCards()
+
+//// DisplayRemainingCards() for testing purposes
 void Deck::DisplayRemainingCards() const
 {
 	vector<Card> tempCards = m_cards;     // Copy deck to a temporary deck
@@ -163,12 +174,27 @@ void Deck::DisplayRemainingCards() const
         tempCards.pop_back();
     }    
 }
-// Shuffle()
+
+//// Calculates total cards per individual deck
+void Deck::CalculateCardsPerDeck()
+{
+    m_cardsPerDeck = (VALUE_CHAR.size() * SUITS.size());
+}
+
+//// Sets the maximum number of cards based on the number of decks chosen by user
+void Deck::SetDeckTotal(int numOfDecks)
+{
+    m_numberOfDecks = numOfDecks;
+    m_maximumCardCount = numOfDecks * m_cardsPerDeck;
+}
+
+//// Shuffle()
 void Deck::Shuffle() 
 {
 	random_shuffle(m_cards.begin(), m_cards.end());	
 }
-// RemoveNextCard
+
+//// RemoveNextCard
 Card Deck::RemoveNextCard() 
 {
 	Card cardOut;                   // Temp card

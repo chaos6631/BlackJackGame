@@ -39,13 +39,14 @@ class BlackJackGame
         // Parameterized Constructor 
 		//BlackJackGame(Player& player) ;
     	// ACCESSORS
-    	
+    	int GetCardCount() const;
         // MUTATORS        
         void BettingPrompt();
         bool CheckNaturalBlackjack();
         bool ContinuePlayingPrompt();
         void DealCards();
         void DealerRound();
+        void DecksToPlayWith();
         void PlayerNamePrompt();
         bool PlayerDoubleDownCheck();
         void PlayerHitStandCheck();
@@ -70,10 +71,10 @@ class BlackJackGame
 /*************************
  FUNCTION DEFINITIONS
 **************************/
-// Minimum bet should not be more than the default money amount 
-// for the Player class which is 100.
+//// Minimum bet should not be more than the default money amount for the Player class which is 100.
 const double BlackJackGame::MINIMUM_BET = 5;  
-const string SAVE_GAME_FILENAME = "saved_games.dat";
+const string SAVE_GAME_FILENAME = "saved_games.dat"; // File that stores the saved game
+
 //// Constructor
 BlackJackGame::BlackJackGame()
 {
@@ -200,6 +201,51 @@ void BlackJackGame::DealerRound()
     }  
 }
 
+//// Ask user the number of decks they wish to play with
+void BlackJackGame::DecksToPlayWith()
+{
+    int numberOfDecks;                                                       // The number of decks the user chooses  
+    const int NUM_OF_CHOICES = 5;
+    int choices[NUM_OF_CHOICES] = {1, 2, 4, 6, 8};                           // The allowable number of decks to choose from                                   
+    bool valid = false;                                                      // true if input is valid, false if not    
+    stringstream howManyDecks;                                               // message prompt
+    
+    howManyDecks << "\nHow many decks would you like to play with(";       
+    //// Add choices to message prompt    
+    for(int count = 0; count < NUM_OF_CHOICES; count++)
+    {
+        if(count < (NUM_OF_CHOICES - 1))
+        {                   
+            howManyDecks << choices[count] << ", ";    
+        }
+        else
+        {            
+            howManyDecks << choices[count] << ")? ";
+        }        
+    }        
+    //// While the user inputs an INVALID choice do this....
+    while(!valid)
+    {        
+        GUI::GameMessage(howManyDecks.str());
+        myValidation::ClearInputBuffer();
+        numberOfDecks = myValidation::GetValidInteger();        
+        
+        for(int count = 0; count < NUM_OF_CHOICES; count++)
+        {
+            if(numberOfDecks == choices[count])
+            {
+                valid = true;
+            }            
+        }
+        if(!valid)
+        {           
+            GUI::GameMessage("\nThat is not a valid number of decks!\n");                 
+        }
+    }
+    m_gameDeck.SetDeckTotal(numberOfDecks);
+    m_gameDeck.FillDeck();    
+}
+
 //// Get user input for the players name
 void BlackJackGame::PlayerNamePrompt()
 {
@@ -207,6 +253,7 @@ void BlackJackGame::PlayerNamePrompt()
     //GUI::GameMessage("\nOk, see ya later!!\n");
     cout << "Please enter your name: ";
     cin >> playerName;
+    myValidation::ClearInputBuffer();
     m_player = Player(playerName);
 }
 
@@ -401,7 +448,7 @@ void BlackJackGame::Round()
         RoundSettlement();                
     }    
     // Replenish the game deck if card count drops below 50% 
-    if(m_gameDeck.CardsRemaining() < (m_gameDeck.MAX_CARD_COUNT / 2))
+    if(m_gameDeck.CardsRemaining() < (m_gameDeck.GetMaxCardCount() / 2))
     {
         FillDeck();                
     }                       
@@ -413,7 +460,8 @@ void BlackJackGame::StartGame()
     if(!LoadSavedGame())              // If true load saved player data, if false prompt player for name
     {
         PlayerNamePrompt();
-    }      
+    }  
+    DecksToPlayWith();        
     m_gameDeck.Shuffle();    
     GUI::ClearScreen();                                 // Clear the screen
     GUI::DisplayBanner();                              // Display Game Title
@@ -537,5 +585,11 @@ void BlackJackGame::ClearHands()
     m_dealer.ClearHand();    
 }
 
+int BlackJackGame::GetCardCount() const
+{
+    int count;
+    count = m_gameDeck.CardsRemaining();
+    return count;
+}
 #endif
 
