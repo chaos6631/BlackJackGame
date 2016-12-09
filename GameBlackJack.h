@@ -11,20 +11,20 @@
 #define _BLACKJACKGAME
 
 #include "MyInputValidation.h"
-#include "BlackJackGUI.h"
+#include "Card.h"
 #include "Deck.h"
 #include "Player.h"
 #include "Dealer.h"
-#include <fstream>						// needed for ifstream class
-//#include <cstdlib>					// for system()
-//#include <stdexcept>
-//#include <iomanip> 					// for output formatting
-//#include <iostream>
-//#include <string>						// for string
-//#include <sstream>					// for stringstream
-////#include <algorithm>   
-////#include <stack>
-////#include <vector>
+#include "BlackJackGUI.h"
+#include <algorithm>   
+#include <fstream>						
+#include <cstdlib>					// for system()
+#include <iomanip> 					
+#include <iostream>
+#include <stdexcept>
+#include <string>					
+#include <sstream>					
+#include <vector>
 
 
 using namespace std;
@@ -35,35 +35,37 @@ class BlackJackGame
     public:
         static const double MINIMUM_BET; 
         static const int MAXIMUM_SCORE;          
-        // default Constructor
-        BlackJackGame(); 				// Should be able to define it here as well
-        // Parameterized Constructor 
-		//BlackJackGame(Player& player) ;
-    	// ACCESSORS
+        //// DEFAULT CONSTRUCTOR
+        BlackJackGame(); 				     
+		
+    	//// ACCESSORS
     	int GetCardCount() const;
-        // MUTATORS        
-        void BettingPrompt();
-        bool CheckNaturalBlackjack();
-        bool ContinuePlayingPrompt();
-        void DealCards();
-        void DealSplitHand();                        // Solely for TESTING purposes
-        void DealerRound();
-        void DecksToPlayWith();
-        void PlayerNamePrompt();
-        bool PlayerDoubleDownCheck();
-        void PlayerHitStandCheck(bool isSplitHand);
-        bool PlayerSplitCheck();
-        void PlayerRound();
-        void Round();
-        void RoundSettlement(bool isSplitHand);
-        void StartGame();
-        void ShuffleDeck();
-        void FillDeck();
-        void ClearHands();
-        bool LoadSavedGame();
-        void SaveGame();
-        void SaveGamePrompt();
-		// OPERATORS
+    	
+        //// MUTATORS        
+        void BettingPrompt();                         // Asks Player how much they would like to bet.
+        bool CheckNaturalBlackjack();                 // Checks if player or dealer has a natural blackjack.
+        bool ContinuePlayingPrompt();                 // Checks if th eplayer would like to continue playing.
+        void DealCards();                             // Deals out the cards at the start of a round.
+        void DealSplitHand();                         // Solely for TESTING purposes.
+        void DealerRound();                           // Plays out the dealers hand.
+        void DecksToPlayWith();                       // Asks the player how many decks they wish to play with.
+        void PlayerNamePrompt();                      // Asks the player to enter their name.
+        bool PlayerDoubleDownCheck();                 // Checks if the player can double-down and if they want to.
+        void PlayerHitStandCheck(bool isSplitHand);   // Asks player if they want to HIT or Stand for the hand, 
+                                                      // hand is decided TRUE for regular, FALSE for split.
+        bool PlayerSplitCheck();                      // Checks if a player would like to split.
+        void PlayerRound();                           // Plays out the players hand, calling other functions.
+        void Round();                                 // Plays out an entire round, player and dealer.
+        void RoundSettlement(bool isSplitHand);       // Checks the total of the decided hand and performs the appropriate
+                                                      // actions.
+        void StartGame();                             // Starts the initial sequence of the game.
+        void ShuffleDeck();                           // Shuffles the card objects currently in m_gameDeck.
+        void FillDeck();                              // Fills the deck with cards to the current maximum card count,
+                                                      // specified in DecksToPlayWith.
+        void ClearHands();                            // Removes all cards from the player and dealers hands.
+        bool LoadSavedGame();                         // Loads the current saved game.
+        void SaveGame();                              // Saves the current game.
+        void SaveGamePrompt();                        // Asks user to save game.		
 	private:
 		Player m_player;
 		Dealer m_dealer;
@@ -186,11 +188,11 @@ bool BlackJackGame::ContinuePlayingPrompt()
 //// Deal cards to the player and dealer
 void BlackJackGame::DealCards()
 {    
-    Delay(500);    
+    Delay(300);    
     for(int cardsPerPlayer = 1;cardsPerPlayer <= 2; cardsPerPlayer++)
     {
         m_player.AddCard(m_gameDeck.RemoveNextCard());
-        Delay(750);
+        Delay(600);
         GUI::GameScreen(m_player, m_dealer);
         if(cardsPerPlayer == 1)
         {
@@ -202,7 +204,7 @@ void BlackJackGame::DealCards()
         {
             m_dealer.AddCard(m_gameDeck.RemoveNextCard());
         }                
-        Delay(750);
+        Delay(600);
         GameScreen(m_player, m_dealer);
     }                        
 }
@@ -212,8 +214,9 @@ void BlackJackGame::DealSplitHand()
 {   //int value, char valueChar , string suit, char suitChar, bool faceUp = true
     Card card1(5, '5', "Hearts", 'H', true);
     Card card2(5, '5', "Clubs", 'C', true);
+    //// Dealers hand set for Soft 17
     Card card3(6, '6', "Hearts", 'H', true);
-    Card card4(10, 'J', "Hearts", 'H', true);
+    Card card4(1, 'A', "Hearts", 'H', true);
     m_player.AddCard(card1);
     m_player.AddCard(card2);
     m_dealer.AddCard(card3);
@@ -225,12 +228,20 @@ void BlackJackGame::DealerRound()
 {
     bool dealerContinue = true;
     while(dealerContinue)
-    {
+    {        
+        //// Proceed to play dealers hand
         if(m_dealer.GetTotalValue() < 17)
         {
             m_dealer.Hit(m_gameDeck.RemoveNextCard());
             Delay(600);
             GameScreen(m_player, m_dealer);
+        }
+        //// Soft 17 check
+        else if(m_dealer.Soft17Check())
+        {
+            m_dealer.Hit(m_gameDeck.RemoveNextCard());
+            Delay(600);
+            GameScreen(m_player, m_dealer);   
         }
         else if(m_dealer.GetTotalValue() >= 17)
         {
@@ -643,7 +654,7 @@ void BlackJackGame::SaveGame()
 		    GUI::GameMessage("Saving Game");		
 		    for(int count = 1; count <= 5; count++)				       /**************SIMULATED DELAY***************/
 			{														   // Simulated delay for 1 second for user interaction,					
-				GUI::Delay(750);	
+				GUI::Delay(100);	
                 GUI::GameMessage("..");								   // Just to slow things down a bit. Not required	    				
 			}	
 			GUI::GameMessage("Game Saved!!!");			

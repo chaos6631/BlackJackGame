@@ -13,22 +13,19 @@
 
 #include "Card.h"
 #include "Player.h"
-//#include <cstdlib>					// for system()
-//#include <stdexcept>
-//#include <iomanip> 					// for output formatting
-//#include <iostream>
-//#include <string>					    // for string
-//#include <sstream>					// for stringstream
+#include <cstdlib>					// for system()
+#include <iomanip> 					// for output formatting
+#include <iostream>
+#include <stdexcept>
+#include <string>					    // for string
+#include <sstream>					// for stringstream
 #include <vector>
 
 using namespace std;
 
 class Dealer : public Player
 {
-    public:
-        // STATIC DATA MEMBERS
-        static const double DEFAULT_MONEY_AMOUNT;
-        
+    public:                
 		// DEFAULT CONSTRUCTOR
 		Dealer(): Player("Dealer"), m_dealersTurn(false) {}
         
@@ -36,7 +33,7 @@ class Dealer : public Player
         Dealer(string name);
         
 		// ACCESSORS
-        
+        bool Soft17Check();
         // MUTATORS
         void FlipInitialCard();                     // Method used to flip the initial card dealt to the dealer face up
         void Hit(Card newCard);    					// Gets a new card and places it in the hand
@@ -48,21 +45,41 @@ class Dealer : public Player
  Dealer Class Definitions
  *********************/ 
  
-// Parameterized Constructor
+//// Parameterized Constructor
 Dealer::Dealer(string name)
 {
     // call base class constructor
     m_playerName = name;        
 }
-// FlipInitialCard() : Method used to flip the initial card dealt to the dealer face up
+
+//// FlipInitialCard() : Method used to flip the initial card dealt to the dealer face up
 void Dealer::FlipInitialCard()
 {
     m_hand[0].m_isFaceUp = true;
     m_dealersTurn = true;
 }
-// Hit() : Gets a new card and places it in the hand
+
+//// Hit() : Gets a new card and places it in the hand
 void Dealer::Hit(Card newCard)
 {       
     m_hand.push_back(newCard);       
 }
+
+//// Soft17Check
+bool Dealer::Soft17Check()
+{
+    bool isSoft = false;
+    
+    //// If either of the 2 initial cards is an ace and total value of cards is 17
+    if(Dealer::GetTotalValue() == 17)
+    {
+        if(m_hand[0].GetValueChar() == 'A' || m_hand[1].GetValueChar() == 'A')
+        {        
+            isSoft = true;
+        }
+    }    
+    
+    return isSoft;
+}
+
 #endif

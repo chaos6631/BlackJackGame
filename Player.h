@@ -11,12 +11,12 @@
 #define _PLAYER
 
 #include "Card.h"
-//#include <cstdlib>					// for system()
-//#include <stdexcept>
-//#include <iomanip> 					// for output formatting
-//#include <iostream>
-//#include <string>					    // for string
-//#include <sstream>					// for stringstream
+#include <cstdlib>					// for system()
+#include <iomanip> 					// for output formatting
+#include <iostream>
+#include <stdexcept>
+#include <string>					    // for string
+#include <sstream>					// for stringstream
 #include <vector>
 
 using namespace std;
@@ -34,15 +34,15 @@ class Player
         Player(string name, double money = DEFAULT_MONEY_AMOUNT);
         
 		// ACCESSORS
-        void ShowCards() const;                                  // Display all cards in the regular hand     
-        void ShowSplitCards() const;                             // Display all cards in the split hand         
-        string GetPlayerName() const { return m_playerName; };
-        double GetPlayerMoneyTotal() const { return m_money; };  //OVERRIDE IN DEALER CLASS
-        double GetCurrentBet() const { return m_currentBet; };
-        double GetCurrentSplitBet() const { return m_splitBet; };
+        string GetPlayerName() const { return m_playerName; };   // Returns a string of the players name
+        double GetCurrentBet() const { return m_currentBet; };   // Returns current bet amount as double
+        double GetCurrentSplitBet() const { return m_splitBet; };// Returns current split bet amount as double
         int GetTotalValue() const ;                              // Get the total value of all the cards in the hand   
         int GetSplitTotalValue() const;                          // Get the total value of all the cards in the split hand  
+        void ShowCards() const;                                  // Display all cards in the regular hand     
+        void ShowSplitCards() const;                             // Display all cards in the split hand         
         bool CanSplit();                                         // True if players first two cards are same face char, false if not
+        double GetPlayerMoneyTotal() const { return m_money; };  // Returns the money total for the player as a double
         
 		// MUTATORS
         void AddCard(Card newCard)    ;           				 // Add a card to the hand
@@ -74,14 +74,14 @@ class Player
  
 const double Player::DEFAULT_MONEY_AMOUNT = 100;
 
-// Parameterized Constructor
+//// Parameterized Constructor
 Player::Player(string name, double money)
 {
     m_playerName = name;    
     m_money = money;
     m_currentBet = 0;
 }
-// ShowCards() : Display all cards in the regular hand
+//// ShowCards() : Display all cards in the regular hand
 void Player::ShowCards() const
 {
     Card card;                            // Create temp card used to display card values    
@@ -97,7 +97,7 @@ void Player::ShowCards() const
         }        
     }  
 }
-// ShowSplitCards() : Display all cards in the split hand
+//// ShowSplitCards() : Display all cards in the split hand
 void Player::ShowSplitCards() const
 {
     Card card;                            // Create temp card used to display card values    
@@ -113,7 +113,7 @@ void Player::ShowSplitCards() const
         }        
     }  
 }
-// GetTotalValue() : Get the total value of all the cards in the hand
+//// GetTotalValue() : Get the total value of all the cards in the hand
 int Player::GetTotalValue() const
 {
     int total = 0;
@@ -176,7 +176,8 @@ int Player::GetTotalValue() const
         } 
     return total;
 }
-//GetSplitTotalValue() : Get the total value of all the cards in the split hand
+
+//// GetSplitTotalValue() : Get the total value of all the cards in the split hand
 int Player::GetSplitTotalValue() const
 {
     int total = 0;
@@ -239,7 +240,8 @@ int Player::GetSplitTotalValue() const
         } 
     return total;
 }
-// SplitHand() : Splits m_hand placing the second card into m_splithand 
+
+//// SplitHand() : Splits m_hand placing the second card into m_splithand 
 void Player::SplitHand()
 {
     if(CanSplit())
@@ -255,7 +257,8 @@ void Player::SplitHand()
         throw invalid_argument("Error::Cards must be equal value characters to split!!\n");
     }
 }
-// CanSplit() : Determines if both card values are equal
+
+//// CanSplit() : Determines if both card values are equal
 bool Player::CanSplit()
 {
     bool canSplit = false;
@@ -268,12 +271,14 @@ bool Player::CanSplit()
     }
     return canSplit;			
 }
-// AddCard() : Add a card to the hand
+
+//// AddCard() : Add a card to the hand
 void Player::AddCard(Card newCard)
 {
     m_hand.push_back(newCard);
 }
-// Bet() : Determines if the amount placed for the bet is available.
+
+//// Bet() : Determines if the amount placed for the bet is available.
 void Player::Bet(double amount)
 {
     double maxBetAmount = m_money;
@@ -281,19 +286,19 @@ void Player::Bet(double amount)
     {
         m_money -= amount;
         m_currentBet = amount;
-        cout << "You have bet $" << amount << endl;
+        cout << "You have chosen to bet $" << amount << endl;
     }
     else
     {
         throw invalid_argument("The amount bet can't be more than the player has available or less than zero!!");
     }
 }
-// Stand() : 
+//// Stand() : 
 void Player::Stand()
 {
     
 }
-//Hit() : Gets a new card and places it in either m_hand or m_splitHand depending on isSplitHand
+//// Hit() : Gets a new card and places it in either m_hand or m_splitHand depending on isSplitHand
 void Player::Hit(Card newCard, bool isSplitHand)
 {   
     if(isSplitHand)   // If isSplitHand is true put the new card in m_splitHand

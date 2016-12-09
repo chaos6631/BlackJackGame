@@ -10,9 +10,9 @@
 #define _PLAYINGCARD
 
 #include <cstdlib>					// for system()
-#include <stdexcept>
 #include <iomanip> 					// for output formatting
 #include <iostream>
+#include <stdexcept>
 #include <string>					// for string
 #include <sstream>					// for stringstream
 
@@ -28,24 +28,30 @@
 
 using namespace std;
 
-// Card Class Declaration : Validation should come from the Deck class to ensure that Card can be used in any game
+/********************* 
+ CARD CLASS DECLARATION
+ **********************/ 
+
 class Card 
 {
 	public:
-
-		// Default Constructor
+        //// Card Class: Validation should come from the Deck class to ensure that Card can be used in any game
+		//// DEFAULT CONSTRUCTOR
 		Card(): m_value(1), m_valueChar('A'), m_suit("Hearts"), m_suitChar('H'), m_isFaceUp(true) {}
 		
-		// Paramaterized Constructor
+		//// PARAMATERIZED CONSTRUCTOR
 		Card(int value, char valueChar , string suit, char suitChar, bool faceUp = true);
 		
-		// Copy Constructor
+		//// COPY CONSTRUCTOR
         Card(const Card &source); // NEW! copy constructor	
 		
-		// Mutators
-		   //TODO NEED SETS FOR EACH MEMBER VARIABLE
+		//// MUTATORS
+        void SetValue(int value) { m_value = value; };
+        void SetValueChar(char valueChar) { m_valueChar = valueChar; };
+        void SetSuit(string suit) { m_suit = suit; };
+        void SetSuitChar(char suitChar) { m_suitChar = suitChar; };
         
-		// Accesors
+		//// ACCESORS
 		int GetValue() const { return m_value; };
 		char GetValueChar() const { return m_valueChar; };
 		string GetSuit() const { return m_suit; };
@@ -54,15 +60,15 @@ class Card
 		void ShowCardShortDetails() const;
 		void OutputSuitChar(char suit) const;
 		
-		// Operators
+		//// OPERATORS
 		Card& operator=(const Card &source); // assignment operator	
 		operator string () const; // convert the obj to a string.
 		
-		// Public member variables
+		//// PUBLIC MEMBER VARIABLES
 		bool m_isFaceUp; // true if face-up, false if face-down
 	
 	private:
-	    // Member Variables
+	    //// MEMBER VARIABLES
 		int m_value;
 		char m_valueChar;
 		string m_suit;
@@ -71,9 +77,9 @@ class Card
 };
 
 /********************* 
- Card class Definitions
+ CARD CLASS DEFINITIONS
  **********************/ 
-// Parameterized Constructor
+//// Parameterized Constructor
 Card::Card(int value, char valueChar , string suit, char suitChar, bool faceUp)
 {
     if(value == 0)
@@ -91,7 +97,7 @@ Card::Card(int value, char valueChar , string suit, char suitChar, bool faceUp)
     }
 }
 
-// Copy Constructor
+//// Copy Constructor
 Card::Card(const Card &source)
 {
     m_value = source.m_value;
@@ -101,7 +107,7 @@ Card::Card(const Card &source)
     m_isFaceUp = source.m_isFaceUp;
 }
 
-// Operator=
+//// Operator=
 Card& Card::operator=(const Card &source)
 {
     m_value = source.m_value;
@@ -113,7 +119,7 @@ Card& Card::operator=(const Card &source)
     return *this;
 }
 
-// ShowCardDetails() : Used for testing purposes, shows all details
+//// ShowCardDetails() : Used for testing purposes, shows all details
 void Card::ShowCardDetails() const 
 {    
     string visibility;               // Face-Up, Face-Down
@@ -142,7 +148,7 @@ void Card::ShowCardDetails() const
          << "    Card Values: " << m_value << " represented by '" << value << "'\n";
 }
 
-// ShowCardShortDetails() : Used for game shows minimal details in game friendly format
+//// ShowCardShortDetails() : Used for game shows minimal details in game friendly format
 void Card::ShowCardShortDetails() const
 {
     string value;                    // ValueChar
@@ -156,7 +162,7 @@ void Card::ShowCardShortDetails() const
         {
             value.push_back(m_valueChar);            
         }
-        cout << value;
+        cout << value;        
         OutputSuitChar(m_suitChar);   
     }
     else
@@ -165,7 +171,7 @@ void Card::ShowCardShortDetails() const
     }  
 }
 
-// operator string ()
+//// operator string ()
 Card::operator string () const
 {
 	// declare a stringstream object
@@ -188,7 +194,10 @@ Card::operator string () const
 /********************* 
  Custom Function Definitions
  *********************/ 
-// The values in this function depend on the type of Deck used, must be changed if different style of deck is required
+// The values in this function depend on the type of Deck used, 
+// must be changed if different style of deck is required.
+// Function can be omitted from ShowCardShortDetails(), and replaced
+// with-> cout << " of " << m_suit;
 void Card::OutputSuitChar(char suit) const
 {
     _setmode(_fileno(stdout), _O_WTEXT);      	// Sets output mode to wide text

@@ -8,29 +8,30 @@
 */
 
 #include "MyInputValidation.h"
-#include "GameBlackJack.h"
+#include "Card.h"	
+#include "Deck.h"
+#include "Player.h"
+#include "Dealer.h"
 #include "BlackJackGUI.h"
+#include "GameBlackJack.h"
+#include <algorithm>   
+#include <cstdlib>					// for system()
 #include <ctime>
-//#include "Deck.h"	// for external file
-//#include "Player.h"
-//#include <cstdlib>					// for system()
-//#include <stdexcept>
-//#include <algorithm>   
-//#include <iomanip> 					// for output formatting
-//#include <iostream>
-//#include <string>					// for string
-//#include <sstream>					// for stringstream
-//#include <stack>
-//#include <vector>
-// Required for Card Symbol Characters
-//#include <clocale>
-//#include <cstdio>
-//#include <windows.h>
-//#include <fcntl.h>
-//#include <io.h>
-//#include <wchar.h>
-//
-//#pragma execution_character_set( "utf-8" )
+#include <iomanip> 					// for output formatting
+#include <iostream>
+#include <stdexcept>
+#include <string>					// for string
+#include <sstream>					// for stringstream
+#include <vector>
+//// Required for Card Symbol Characters
+#include <clocale>
+#include <cstdio>
+#include <fcntl.h>
+#include <io.h>
+#include <wchar.h>
+#include <windows.h>
+
+#pragma execution_character_set( "utf-8" )
 
 using namespace std;
 using namespace myValidation;
@@ -78,7 +79,7 @@ int main()
             //// Prompt for Bet, then deal cards
             game.BettingPrompt();                              // Ask player how much they wish to bet            
             game.DealCards();                                  // Deal cards (comment out to test for SPLIT)
-            //game.DealSplitHand();                            // TESTING FOR SPLITHAND FUNCTIONALITY
+            //game.DealSplitHand();                            // TESTING FOR SPLITHAND & SOFT 17 FUNCTIONALITY
             
             //// Check for Natural Blackjack
             if(!game.CheckNaturalBlackjack())                  // False if neither player or dealer has a natural blackjack   
