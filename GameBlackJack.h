@@ -186,11 +186,11 @@ bool BlackJackGame::ContinuePlayingPrompt()
 //// Deal cards to the player and dealer
 void BlackJackGame::DealCards()
 {    
-    //Delay(0.5);    
+    Delay(500);    
     for(int cardsPerPlayer = 1;cardsPerPlayer <= 2; cardsPerPlayer++)
     {
         m_player.AddCard(m_gameDeck.RemoveNextCard());
-        //Delay(0.5);
+        Delay(750);
         GUI::GameScreen(m_player, m_dealer);
         if(cardsPerPlayer == 1)
         {
@@ -202,7 +202,7 @@ void BlackJackGame::DealCards()
         {
             m_dealer.AddCard(m_gameDeck.RemoveNextCard());
         }                
-        //Delay(0.5);
+        Delay(750);
         GameScreen(m_player, m_dealer);
     }                        
 }
@@ -229,8 +229,8 @@ void BlackJackGame::DealerRound()
         if(m_dealer.GetTotalValue() < 17)
         {
             m_dealer.Hit(m_gameDeck.RemoveNextCard());
+            Delay(600);
             GameScreen(m_player, m_dealer);
-            //Delay(1);
         }
         else if(m_dealer.GetTotalValue() >= 17)
         {
@@ -571,6 +571,7 @@ void BlackJackGame::StartGame()
     GUI::GameInfo(m_player);                           // Display Player information
 }
 
+//// Loads the saved game
 bool BlackJackGame::LoadSavedGame()
 {
     
@@ -616,6 +617,7 @@ bool BlackJackGame::LoadSavedGame()
     return loadGame;
 }
 
+//// Creates or overwrites the saved game
 void BlackJackGame::SaveGame()
 {
     
@@ -641,11 +643,11 @@ void BlackJackGame::SaveGame()
 		    GUI::GameMessage("Saving Game");		
 		    for(int count = 1; count <= 5; count++)				       /**************SIMULATED DELAY***************/
 			{														   // Simulated delay for 1 second for user interaction,					
-				//GUI::Delay(0.1);	
-                GUI::GameMessage("..");										 		// just to slow things down a bit. Not required	    				
+				GUI::Delay(750);	
+                GUI::GameMessage("..");								   // Just to slow things down a bit. Not required	    				
 			}	
 			GUI::GameMessage("Game Saved!!!");			
-			outFile << output.str();						// Write the contents of output to the file				
+			outFile << output.str();						           // Write the contents of output to the file				
 		}
     }
     catch(ifstream::failure& error)	
@@ -659,7 +661,7 @@ void BlackJackGame::SaveGame()
     
 }
 
-
+//// Asks user if they would like to save their game
 void BlackJackGame::SaveGamePrompt()
 {
     if(GUI::YesNoChoicePrompt("\nWould you like to save your game(y/n)?"))
@@ -689,6 +691,7 @@ void BlackJackGame::ClearHands()
     m_dealer.m_dealersTurn = false;   
 }
 
+//// Specifically for TESTING multiple decks
 int BlackJackGame::GetCardCount() const
 {
     int count;

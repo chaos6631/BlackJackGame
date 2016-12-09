@@ -29,7 +29,7 @@ namespace GUI
      *  @param seconds: the number of seconds to delay the program
      *	@returns void
 	*/
-    void Delay(double seconds);
+    void Delay(unsigned int milliseconds);
     
     /**	DisplayBanner function
 	 * - Displays the game logo     
@@ -116,11 +116,12 @@ namespace GUI
     /*************************
      FUNCTION DEFINITIONS
     **************************/
-    void Delay(double seconds)
+    void Delay(unsigned int milliseconds)
     {	
-    	clock_t startTime = clock();							// Start time for delay
-    	clock_t endTime = seconds * 1000 + startTime;			// End time for delay is seconds * 1000 milliseconds after start time
-    	while(clock() != endTime);								// Loop to simulate delay	
+    	//clock_t startTime = clock();							// Start time for delay
+    	//clock_t endTime = milliseconds + startTime;			    // End time for delay is seconds * 1000 milliseconds after start time
+    	//while(clock() != endTime);								// Loop to simulate delay	
+    	Sleep(milliseconds);
     } // END DELAY
     
     void DisplayBanner()

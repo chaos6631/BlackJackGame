@@ -66,7 +66,10 @@ int main()
             GUI::ClearScreen();
             GUI::DisplayBanner(); 
             //// Start the Game if player wishToPlay is true
-            game.StartGame();           
+            game.StartGame();  
+            //// TEST FOR MULTIPLE DECKS  
+            //cout << game.GetCardCount() << "cards in the game deck!!";
+            //GUI::PauseGame();       
         }
                 
         //// Continue playing rounds as long as player wants to continue
