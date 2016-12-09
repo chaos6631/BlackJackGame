@@ -1,6 +1,6 @@
 /*
 * Project Name: Final Project: Blackjack
-* Author: Chris Calder #100601097,
+* Author: Chris Calder #100601097, Christopher Alexander #100360337
 * Date: November 8, 2016
 *
 * Description:  A Player class that reperesents an instance of a player in a Blackjack game.

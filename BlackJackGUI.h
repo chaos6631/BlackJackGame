@@ -1,6 +1,6 @@
 /*
 * Project Name: Final Project: BlackJack
-* Author: Chris Calder #100601097, 
+* Author: Chris Calder #100601097, Christopher Alexander #100360337
 * Date: November 21, 2016
 *
 * Description:  A library of screen output functions that represent the GUI interface of the GameBlackJack class

@@ -1,6 +1,6 @@
 /*
 * Project Name: Final Project: Blackjack
-* Author: Chris Calder #100601097,
+* Author: Chris Calder #100601097, Christopher Alexander #100360337
 * Date: November 30, 2016
 *
 * Description:  A Dealer class that uses Player class as a base class reperesenting 

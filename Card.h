@@ -1,6 +1,6 @@
 /*
-* Project Name: Lab ?:
-* Author: Chris Calder #100601097,
+* Project Name: Final Project: Blackjack
+* Author: Chris Calder #100601097, Christopher Alexander #100360337
 * Date: 
 *
 * Description:  A Playing Card Class file
