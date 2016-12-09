@@ -88,15 +88,27 @@ BlackJackGame::BlackJackGame()
 void BlackJackGame::BettingPrompt()
 {
     double betAmount;
+    bool valid = false;
     stringstream infoMessage;
     GUI::ClearScreen();                                 // Clear the screen
     GUI::DisplayBanner();                               // Display Game Title
     GUI::GameInfo(m_player);                            // Display Player information
     infoMessage << "\n(Minimum bet is $" << MINIMUM_BET << ", you may increase in $5 increments)" << "\nPlace your bet: $";
     GUI::GameMessage(infoMessage.str());
-    //cout << "\n(Minimum bet is $" << MINIMUM_BET << ", you may increase in $5 increments)"
-    //    << "\nPlace your bet: $";
-    betAmount = myValidation::GetValidDouble(MINIMUM_BET, m_player.GetPlayerMoneyTotal());
+    
+    while(!valid)
+    {
+        if((myValidation::GetValidInteger(MINIMUM_BET, m_player.GetPlayerMoneyTotal()) % 5) > 0)
+        {            
+            GUI::GameMessage("\nINVALID!! Bet must be increments of 5.");
+            GUI::GameMessage(infoMessage.str());
+            valid = false;
+        }
+        else
+        {
+            valid = true;
+        }
+    }
     // need to create a validator that uses GetValidDouble and checks that the input value is an increment of 5
     m_player.Bet(betAmount); 
 }
