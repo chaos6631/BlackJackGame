@@ -118,9 +118,9 @@ namespace GUI
     **************************/
     void Delay(double seconds)
     {	
-    	clock_t start_time = clock();							// Start time for delay
-    	clock_t end_time = seconds * 1000 + start_time;			// End time for delay is seconds * 1000 milliseconds after start time
-    	while(clock() != end_time);								// Loop to simulate delay	
+    	clock_t startTime = clock();							// Start time for delay
+    	clock_t endTime = seconds * 1000 + startTime;			// End time for delay is seconds * 1000 milliseconds after start time
+    	while(clock() != endTime);								// Loop to simulate delay	
     } // END DELAY
     
     void DisplayBanner()

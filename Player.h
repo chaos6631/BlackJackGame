@@ -45,7 +45,7 @@ class Player
         void Bet(double amount);                   // OVERRIDE IN DEALER CLASS
     	void Stand();                              // Does Nothing at the moment
     	void Hit(Card newCard, bool isSplitHand);  // Gets a new card and places it in either m_hand or m_splitHand depending on isSplitHand
-    	void DoubleDown(double amount);            // Doubles the current bet
+    	void DoubleDown();            // Doubles the current bet
     	void ClearHand();                          // Removes all cards from hand
     	void CollectMoney(double amount);          // Add winnings to m_money 	
     	void SplitHand();                          // Splits m_hand placing the second card into m_splithand        
@@ -300,12 +300,11 @@ void Player::Hit(Card newCard, bool isSplitHand)
     }
 }
 
-void Player::DoubleDown(double amount)
+void Player::DoubleDown()
 {    
     double maxBetAmount = m_money;
-        
-    if(m_currentBet <= maxBetAmount && m_currentBet >= 0)
-    if(amount <= maxBetAmount && amount >= 0)
+            
+    if(m_currentBet <= m_money)
     {
         m_money -= m_currentBet;
         m_currentBet += m_currentBet;        

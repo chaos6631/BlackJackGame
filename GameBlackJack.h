@@ -87,7 +87,7 @@ BlackJackGame::BlackJackGame()
 //// Betting Prompt
 void BlackJackGame::BettingPrompt()
 {
-    double betAmount;
+    int betAmount;
     bool valid = false;
     stringstream infoMessage;
     GUI::ClearScreen();                                 // Clear the screen
@@ -98,7 +98,8 @@ void BlackJackGame::BettingPrompt()
     
     while(!valid)
     {
-        if((myValidation::GetValidInteger(MINIMUM_BET, m_player.GetPlayerMoneyTotal()) % 5) > 0)
+        betAmount = myValidation::GetValidInteger(MINIMUM_BET, m_player.GetPlayerMoneyTotal());        
+        if((betAmount % 5) > 0)
         {            
             GUI::GameMessage("\nINVALID!! Bet must be increments of 5.");
             GUI::GameMessage(infoMessage.str());
@@ -110,7 +111,7 @@ void BlackJackGame::BettingPrompt()
         }
     }
     // need to create a validator that uses GetValidDouble and checks that the input value is an increment of 5
-    m_player.Bet(betAmount); 
+    m_player.Bet((double)betAmount); 
 }
 
 //// Check for Natural Blackjack
@@ -123,6 +124,9 @@ bool BlackJackGame::CheckNaturalBlackjack()
     {        
         infoMessage << "Both you and the m_dealer have BLACKJACK!" << endl
                     << "Game is a Stand-Off(tie), you get your initial bet back!" << endl;
+        m_dealer.FlipInitialCard();
+        m_dealer.m_dealersTurn = true;
+        GUI::GameScreen(m_player, m_dealer);
         GUI::GameMessage(infoMessage.str());
         m_player.CollectMoney(m_player.GetCurrentBet());
         isRoundOver = true;
@@ -130,13 +134,19 @@ bool BlackJackGame::CheckNaturalBlackjack()
     else if(m_player.GetTotalValue() == 21 && m_dealer.GetTotalValue() < 21)
     {
         infoMessage << "BlackJack!..... You win $" << (m_player.GetCurrentBet() * 3) << "!!!!" << endl;
+        m_dealer.FlipInitialCard();
+        m_dealer.m_dealersTurn = true;
+        GUI::GameScreen(m_player, m_dealer);
         GUI::GameMessage(infoMessage.str());
         m_player.CollectMoney(m_player.GetCurrentBet() * 3); 
         isRoundOver = true;
     }
     else if(m_dealer.GetTotalValue() == 21 && m_player.GetTotalValue() < 21)
-    {        
+    {                
         infoMessage << "\nDealer has Blackjack!!...... You lose!" << endl;
+        m_dealer.FlipInitialCard();
+        m_dealer.m_dealersTurn = true;
+        GUI::GameScreen(m_player, m_dealer);
         GUI::GameMessage(infoMessage.str());
         isRoundOver = true;
     }
@@ -166,7 +176,7 @@ bool BlackJackGame::ContinuePlayingPrompt()
             GUI::GameInfo(m_player);
             SaveGamePrompt();
             //GUI::GameMessage("\nOk, see ya later!!\n");      //NOT CREATED YET
-            cout << "\nOk, see ya later!!\n" << endl;
+            cout << "\n\n\nOk, see ya later!!\n" << endl;
             play = false;
         }
     }
@@ -291,14 +301,18 @@ bool BlackJackGame::PlayerDoubleDownCheck()
     stringstream infoMessage;
     
     if(m_player.GetTotalValue() >= 9 && m_player.GetTotalValue() <= 11)
-    {     
-        if(YesNoChoicePrompt("\nWould you like to Double-Down(y/n)? "))   
-        {      
-            m_player.DoubleDown((m_player.GetCurrentBet()));
-            infoMessage << "You have chosen to double down with a bet of $" << m_player.GetCurrentBet() << endl;
-            GUI::GameMessage(infoMessage.str());
-            doublingDown = true;
-        }        
+    {   
+        if(m_player.GetCurrentBet() <= m_player.GetPlayerMoneyTotal())
+        {
+            if(YesNoChoicePrompt("\nWould you like to Double-Down(y/n)? "))   
+            {      
+                m_player.DoubleDown();
+                infoMessage << "You have chosen to double down with a bet of $" << m_player.GetCurrentBet() << endl;
+                GUI::GameMessage(infoMessage.str());
+                doublingDown = true;
+                GUI::PauseGame();                
+            }
+        }                  
     }
     return doublingDown;
 }
@@ -386,8 +400,7 @@ void BlackJackGame::PlayerRound()
     if(PlayerDoubleDownCheck())                            // True if player is doubling down   
     {                
         m_player.Hit(m_gameDeck.RemoveNextCard(), false);  // False because it is not a splithand
-        GameScreen(m_player, m_dealer);                    // Reload screen
-        //Delay(1);
+        GameScreen(m_player, m_dealer);                    // Reload screen        
     }
     else                                                   // False if not going to double down
     {
@@ -488,20 +501,20 @@ void BlackJackGame::Round()
         // Reload the screen
         GameScreen(m_player, m_dealer);
         DealerRound();        
-        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);           
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_GREEN);           
         GUI::GameMessage("\n            RESULTS");
         GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n"); 
-        GUI::ResetConsoleColour();     
         RoundSettlement(false);    
+        GUI::ResetConsoleColour();     
     }
     //// Player has busted and doesn't have a split  
     else if(m_player.GetTotalValue() > 21 || m_player.GetCurrentSplitBet() == 0)
     {
-        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);           
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_GREEN);           
         GUI::GameMessage("\n            RESULTS");
         GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n"); 
-        GUI::ResetConsoleColour();     
         RoundSettlement(false);  
+        GUI::ResetConsoleColour();     
     }
     //// Player has not busted and has a split
     else if(m_player.GetTotalValue() <= 21 || m_player.GetSplitTotalValue() <= 21)
@@ -511,30 +524,30 @@ void BlackJackGame::Round()
         // Reload the screen
         GameScreen(m_player, m_dealer);
         DealerRound();  
-        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);      
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_GREEN);      
         GUI::GameMessage("\n      LEFT SIDE RESULTS");
         GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n");
-        GUI::ResetConsoleColour();  
         RoundSettlement(false);   
-        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);           
+        //GUI::ResetConsoleColour();  
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_GREEN);           
         GUI::GameMessage("\n      RIGHT SIDE RESULTS");
         GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n"); 
-        GUI::ResetConsoleColour();     
         RoundSettlement(true);         
+        GUI::ResetConsoleColour();     
     }  
     //// Player has split and has busted with both hands
     else if(m_player.GetTotalValue() > 21 && m_player.GetSplitTotalValue() > 21)
     {
-        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);      
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_GREEN);      
         GUI::GameMessage("\n      LEFT SIDE RESULTS");
         GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n");
-        GUI::ResetConsoleColour(); 
+        //GUI::ResetConsoleColour(); 
         RoundSettlement(false);   
-        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);           
+        GUI::SetConsoleColour(FOREGROUND_INTENSITY | FOREGROUND_GREEN);           
         GUI::GameMessage("\n      RIGHT SIDE RESULTS");
         GUI::GameMessage("\n''''''''''''''''''''''''''''''''\n"); 
-        GUI::ResetConsoleColour();               
         RoundSettlement(true); 
+        GUI::ResetConsoleColour();               
     }
     
     // Replenish the game deck if card count drops below 50% 
@@ -628,7 +641,7 @@ void BlackJackGame::SaveGame()
 		    GUI::GameMessage("Saving Game");		
 		    for(int count = 1; count <= 5; count++)				       /**************SIMULATED DELAY***************/
 			{														   // Simulated delay for 1 second for user interaction,					
-				GUI::Delay(0.1);	
+				//GUI::Delay(0.1);	
                 GUI::GameMessage("..");										 		// just to slow things down a bit. Not required	    				
 			}	
 			GUI::GameMessage("Game Saved!!!");			
