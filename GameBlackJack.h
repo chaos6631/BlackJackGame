@@ -15,12 +15,12 @@
 #include "Deck.h"
 #include "Player.h"
 #include "Dealer.h"
-#include <fstream>			// needed for ifstream class
+#include <fstream>						// needed for ifstream class
 //#include <cstdlib>					// for system()
 //#include <stdexcept>
 //#include <iomanip> 					// for output formatting
 //#include <iostream>
-//#include <string>					// for string
+//#include <string>						// for string
 //#include <sstream>					// for stringstream
 ////#include <algorithm>   
 ////#include <stack>
@@ -36,7 +36,7 @@ class BlackJackGame
         static const double MINIMUM_BET; 
         static const int MAXIMUM_SCORE;          
         // default Constructor
-        BlackJackGame(); // Should be able to define it here as well
+        BlackJackGame(); 				// Should be able to define it here as well
         // Parameterized Constructor 
 		//BlackJackGame(Player& player) ;
     	// ACCESSORS

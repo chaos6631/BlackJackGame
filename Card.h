@@ -32,19 +32,20 @@ using namespace std;
 class Card 
 {
 	public:
-	    // Stacic Data Members
-//	    static const int MIN_VALUE_AND_SUIT = 0;        // Not used
-//		static const int MAX_SUIT = 3;                  // Not used
-//		static const int MAX_VALUE = 11;                // Not used
+
 		// Default Constructor
 		Card(): m_value(1), m_valueChar('A'), m_suit("Hearts"), m_suitChar('H'), m_isFaceUp(true) {}
+		
 		// Paramaterized Constructor
 		Card(int value, char valueChar , string suit, char suitChar, bool faceUp = true);
+		
 		// Copy Constructor
         Card(const Card &source); // NEW! copy constructor	
+		
 		// Mutators
 		   //TODO NEED SETS FOR EACH MEMBER VARIABLE
-        // Accesors
+        
+		// Accesors
 		int GetValue() const { return m_value; };
 		char GetValueChar() const { return m_valueChar; };
 		string GetSuit() const { return m_suit; };
@@ -52,12 +53,14 @@ class Card
 		void ShowCardDetails() const;
 		void ShowCardShortDetails() const;
 		void OutputSuitChar(char suit) const;
+		
 		// Operators
 		Card& operator=(const Card &source); // assignment operator	
 		operator string () const; // convert the obj to a string.
 		
 		// Public member variables
 		bool m_isFaceUp; // true if face-up, false if face-down
+	
 	private:
 	    // Member Variables
 		int m_value;
@@ -188,11 +191,11 @@ Card::operator string () const
 // The values in this function depend on the type of Deck used, must be changed if different style of deck is required
 void Card::OutputSuitChar(char suit) const
 {
-    _setmode(_fileno(stdout), _O_WTEXT);      // Sets output mode to wide text
-    const wchar_t CLUBS[] = L"\u2663";
-    const wchar_t SPADES[] = L"\u2660";
-    const wchar_t HEARTS[] = L"\u2665";
-    const wchar_t DIAMONDS[] = L"\u2666";
+    _setmode(_fileno(stdout), _O_WTEXT);      	// Sets output mode to wide text
+    const wchar_t CLUBS[] = L"\u2663";			// Constant for clubs suit symbol using unicode
+    const wchar_t SPADES[] = L"\u2660";			// Constant for spades suit symbol using unicode
+    const wchar_t HEARTS[] = L"\u2665";			// Constant for hearts suit symbol using unicode
+    const wchar_t DIAMONDS[] = L"\u2666";		// Constant for diamonds suit symbol using unicode
     
     if(suit == 'H')
     {

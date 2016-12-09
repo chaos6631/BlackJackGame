@@ -165,7 +165,7 @@ namespace GUI
     void GameMessage(string message)
     {
         cout << message;           
-    }
+    }// END GAME MESSAGE
     
     void GameScreen(Player& player1, Dealer& dealer)
     {
@@ -258,12 +258,12 @@ namespace GUI
     void ClearScreen()
     {
         system("CLS");                                     
-    }
+    }// END CLEAR SCREEN
     
     void PauseGame()
     {
         system("pause");
-    }
+    } // END PAUSE GAME
 
     void SetConsoleColour(DWORD Colour)
     {
@@ -272,12 +272,12 @@ namespace GUI
         GetConsoleScreenBufferInfo(hStdout, &Info);
         Attributes = Info.wAttributes;
         SetConsoleTextAttribute(hStdout, Colour);
-    }
+    } // END SETCONSOLECOLOUR
     
     void ResetConsoleColour()
     {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), Attributes);
-    }
+    } // END RESETCONSOLECOLOUR
 
 
 
