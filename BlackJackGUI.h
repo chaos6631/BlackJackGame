@@ -118,10 +118,13 @@ namespace GUI
     **************************/
     void Delay(unsigned int milliseconds)
     {	
-    	//clock_t startTime = clock();							// Start time for delay
+        //// LINUX Systems
+    	//clock_t startTime = clock();							    // Start time for delay
     	//clock_t endTime = milliseconds + startTime;			    // End time for delay is seconds * 1000 milliseconds after start time
     	//while(clock() != endTime);								// Loop to simulate delay	
-    	Sleep(milliseconds);
+    	
+    	//// Windows Systems
+        Sleep(milliseconds);
     } // END DELAY
     
     void DisplayBanner()

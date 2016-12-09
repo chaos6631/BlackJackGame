@@ -67,9 +67,9 @@ class BlackJackGame
         void SaveGame();                              // Saves the current game.
         void SaveGamePrompt();                        // Asks user to save game.		
 	private:
-		Player m_player;
-		Dealer m_dealer;
-        Deck m_gameDeck;
+		Player m_player;            // Player representing the user
+		Dealer m_dealer;            // Dealer for game controlled by game
+        Deck m_gameDeck;            // Deck of cards to be used for game
 };
 
 /*************************

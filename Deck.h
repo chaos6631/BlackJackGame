@@ -3,20 +3,21 @@
 * Author: Chris Calder #100601097, Christopher Alexander #100360337
 * Date: 
 *
-* Description:  A C++ program that ....
+* Description:  A Deck class that represents a deck of cards, made up of Card objects
+*               Also represents multiple figuritive decks as one.
 *				
 */
 #ifndef _DECKOFCARDS
 #define _DECKOFCARDS
 
-#include "Card.h"
+#include "Card.h"               // For Card class
 #include <algorithm>  
-#include <cstdlib>					// for system()
-#include <iomanip> 					// for output formatting
+#include <cstdlib>				// for system()
+#include <iomanip> 					
 #include <iostream>
 #include <stdexcept>
-#include <string>						// for string
-#include <sstream>					// for stringstream
+#include <string>						
+#include <sstream>					
 #include <vector>
 // Required for Card Symbol Characters
 #include <clocale>

@@ -12,11 +12,11 @@
 
 #include "Card.h"
 #include <cstdlib>					// for system()
-#include <iomanip> 					// for output formatting
+#include <iomanip> 					
 #include <iostream>
 #include <stdexcept>
-#include <string>					    // for string
-#include <sstream>					// for stringstream
+#include <string>					    
+#include <sstream>					
 #include <vector>
 
 using namespace std;

@@ -14,11 +14,11 @@
 #include "Card.h"
 #include "Player.h"
 #include <cstdlib>					// for system()
-#include <iomanip> 					// for output formatting
+#include <iomanip> 					
 #include <iostream>
 #include <stdexcept>
-#include <string>					    // for string
-#include <sstream>					// for stringstream
+#include <string>					    
+#include <sstream>					
 #include <vector>
 
 using namespace std;
@@ -43,7 +43,7 @@ class Dealer : public Player
 
 /************************ 
  Dealer Class Definitions
- *********************/ 
+ ************************/ 
  
 //// Parameterized Constructor
 Dealer::Dealer(string name)

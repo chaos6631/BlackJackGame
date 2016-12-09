@@ -3,7 +3,7 @@
 * Author: Chris Calder #100601097, Christopher Alexander #100360337
 * Date: 
 *
-* Description:  A C++ program that ....
+* Description:  A C++ Blackjack game, where a single user can play against the computer.
 *				
 */
 
@@ -17,11 +17,11 @@
 #include <algorithm>   
 #include <cstdlib>					// for system()
 #include <ctime>
-#include <iomanip> 					// for output formatting
+#include <iomanip> 					
 #include <iostream>
 #include <stdexcept>
-#include <string>					// for string
-#include <sstream>					// for stringstream
+#include <string>					
+#include <sstream>					
 #include <vector>
 //// Required for Card Symbol Characters
 #include <clocale>
@@ -37,9 +37,15 @@ using namespace std;
 using namespace myValidation;
 using namespace GUI;
 
-/*************************
+/*********************
  FUNCTION DECLARATIONS
-**************************/
+**********************/
+
+/**	BeginGamePrompt function
+ *
+ *  Asks user if they would like to play a game of Blackjack. 
+ *	@returns True if they wish to play, False if not.
+*/
 bool BeginGamePrompt();
 
 /*************************
@@ -114,7 +120,7 @@ int main()
  FUNCTION DEFINITIONS
 **************************/
 
-bool BeginGamePrompt() // Should stay in BlackJackMain.cpp
+bool BeginGamePrompt() 
 {    
 	bool play = false;
 

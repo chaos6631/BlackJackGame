@@ -3,7 +3,7 @@
  *	A re-usable library of input validation functions.
  *	   
  *	@author		Thom MacDonald
- *	@author		Your name goes here.
+ *	@author		Chris Calder
  *	@version	2014.02
  *	@since		11 Feb 2014
  *	@see 		Bronson, G. (2012).  Chapter 6 Modularity Using Functions. 
