@@ -1,6 +1,6 @@
 /*
-* Project Name: Lab ?:
-* Author: Chris Calder #100601097,
+* Project Name: Final Project: Blackjack
+* Author: Chris Calder #100601097, Christopher Alexander #100360337
 * Date: 
 *
 * Description:  A C++ program that ....
@@ -13,7 +13,7 @@
 //#include <stdexcept>
 //#include <iomanip> 					// for output formatting
 //#include <iostream>
-//#include <string>					// for string
+//#include <string>						// for string
 //#include <sstream>					// for stringstream
 #include "Card.h"
 #include <algorithm>  
@@ -41,10 +41,10 @@ class Deck {
 	    static const int MIN_SUIT_INDEX;          // Minimum index for SUITS and SUIT_CHARS vectors
 		static const int MAX_SUIT_INDEX;          // Maximum index for SUITS and SUIT_CHARS vectors
 		
-		static const vector<string> SUITS;
-        static const vector<char> SUIT_CHARS;         
-        static const vector<int> VALUES;
-        static const vector<char> VALUE_CHAR; 
+		static const vector<string> SUITS;			// Holds the string name for the suits
+        static const vector<char> SUIT_CHARS;       // Holds the Char representation for the suits
+        static const vector<int> VALUES;			// Hold the integer value for the cards
+        static const vector<char> VALUE_CHAR; 		// Holds the Char representation for the values of the cards
         
 	    // CONSTRUCTORS
 	    Deck();                                     // Default
@@ -65,6 +65,7 @@ class Deck {
 		int GetDeckCount() const { return m_numberOfDecks; };         // Returns the number of decks that user has chosen to play with
 		int GetMaxCardCount() const { return m_maximumCardCount; };   // Returns the maximum card count for the deck object
 		int CardsRemaining() const { return m_cards.size(); };        // Returns the number of cards left in the deck object
+	
 	private:
 	    // MEMBERS
 		vector<Card> m_cards;               // A vector of card objects reperesenting individual or multiple decks of cards figuritively.
@@ -114,7 +115,7 @@ Deck& Deck::operator=(const Deck &source)
 	m_cards = source.m_cards;	
 	return *this;
 } 
-//// FillDeck()
+// FillDeck() : Fills the deck with playing cards.
 void Deck::FillDeck() // **PARAM int DeckCount to be added
 {	    
 	int value = 0;				// Temp to hold card point value
@@ -162,8 +163,8 @@ void Deck::FillDeck() // **PARAM int DeckCount to be added
 //// DisplayRemainingCards() for testing purposes
 void Deck::DisplayRemainingCards() const
 {
-	vector<Card> tempCards = m_cards;     // Copy deck to a temporary deck
-    Card card;                            // Create temp card used to display card values
+	vector<Card> tempCards = m_cards;     				 // Copy deck to a temporary deck
+    Card card;                            				 // Create temp card used to display card values
     
     while(!tempCards.empty())                            // While there are still cards output the current card value
     {
@@ -174,27 +175,26 @@ void Deck::DisplayRemainingCards() const
         tempCards.pop_back();
     }    
 }
-
-//// Calculates total cards per individual deck
+// CalculateCardsPerDeck() : Calculates total cards per individual deck
 void Deck::CalculateCardsPerDeck()
 {
     m_cardsPerDeck = (VALUE_CHAR.size() * SUITS.size());
 }
 
-//// Sets the maximum number of cards based on the number of decks chosen by user
+// SetDeckTotal() : Sets the maximum number of cards based on the number of decks chosen by user
 void Deck::SetDeckTotal(int numOfDecks)
 {
     m_numberOfDecks = numOfDecks;
     m_maximumCardCount = numOfDecks * m_cardsPerDeck;
 }
 
-//// Shuffle()
+// Shuffle() : Shuffles all cards remaining.
 void Deck::Shuffle() 
 {
 	random_shuffle(m_cards.begin(), m_cards.end());	
 }
 
-//// RemoveNextCard
+// RemoveNextCard() : Remove the top card from the deck.
 Card Deck::RemoveNextCard() 
 {
 	Card cardOut;                   // Temp card

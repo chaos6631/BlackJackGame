@@ -1,6 +1,6 @@
 /*
 * Project Name: Final Project: BlackJack
-* Author: Chris Calder #100601097, 
+* Author: Chris Calder #100601097, Christopher Alexander #100360337
 * Date: November 21, 2016
 *
 * Description:  A library of screen output functions that represent the GUI interface of the GameBlackJack class
@@ -166,7 +166,7 @@ namespace GUI
     void GameMessage(string message)
     {
         cout << message;           
-    }
+    }// END GAME MESSAGE
     
     void GameScreen(Player& player1, Dealer& dealer)
     {
@@ -259,12 +259,12 @@ namespace GUI
     void ClearScreen()
     {
         system("CLS");                                     
-    }
+    }// END CLEAR SCREEN
     
     void PauseGame()
     {
         system("pause");
-    }
+    } // END PAUSE GAME
 
     void SetConsoleColour(DWORD Colour)
     {
@@ -273,12 +273,12 @@ namespace GUI
         GetConsoleScreenBufferInfo(hStdout, &Info);
         Attributes = Info.wAttributes;
         SetConsoleTextAttribute(hStdout, Colour);
-    }
+    } // END SETCONSOLECOLOUR
     
     void ResetConsoleColour()
     {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), Attributes);
-    }
+    } // END RESETCONSOLECOLOUR
 
 
 
